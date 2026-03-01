@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeWealth Pro - 極簡財務管家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@300;400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans HK', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent; 
+            color: #334155;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* 動畫 */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-enter { opacity: 1; pointer-events: auto; }
+        .modal-enter .modal-content { transform: translateY(0) scale(1); }
+        .modal-leave { opacity: 0; pointer-events: none; }
+        .modal-leave .modal-content { transform: translateY(20px) scale(0.95); }
+
+        .toast-enter { transform: translateY(0) translateX(-50%); opacity: 1; }
+        .toast-leave { transform: translateY(20px) translateX(-50%); opacity: 0; pointer-events: none; }
+
+        .nav-active { color: #3b82f6; font-weight: 700; }
+        .nav-inactive { color: #94a3b8; }
+        .hidden-view { display: none !important; }
+
+        /* 3-way toggle switch */
+        .toggle-pos-0 { transform: translateX(0%); }
+        .toggle-pos-1 { transform: translateX(100%); }
+        .toggle-pos-2 { transform: translateX(200%); }
+    </style>
+<body class="selection:bg-blue-100 pb-24 sm:pb-8 relative overflow-x-hidden min-h-screen flex flex-col">
+
+    <!-- 最頂部：使用者資訊列 -->
+    <div class="bg-slate-800 text-white py-1.5 px-4 sm:px-6 flex justify-between items-center relative z-50">
+        <div id="user-details-text" class="flex items-center overflow-hidden mr-2 text-[10px] sm:text-xs">載入中...</div>
+        <div id="auth-action-btn" class="shrink-0 text-xs"></div>
+    </div>
+
+    <!-- 頂部導航 -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 flex justify-between items-center">
+            <div class="flex flex-col overflow-hidden">
+                <div class="flex items-center space-x-2">
+                    <div class="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-sm shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h1 class="text-lg font-black tracking-tight text-slate-800">SafeWealth</h1>
+                </div>
+                <!-- 標語融入頂部導航，不再獨立成卡片 -->
+                <div class="mt-0.5 flex items-center text-[10px] sm:text-xs text-blue-600/80 font-medium cursor-pointer hover:text-blue-700 transition-colors truncate" onclick="changeSlogan()">
+                    <span class="mr-1 shrink-0">💡</span> <span id="slogan-text" class="truncate transition-opacity duration-200">載入中...</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center pl-2 shrink-0">
+                <button onclick="openSettingsModal()" class="p-2 text-slate-400 hover:text-blue-600 transition-colors rounded-full hover:bg-blue-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 z-10">
+        
+        <!-- ==================== 首頁 Dashboard ==================== -->
+        <div id="view-home" class="fade-in space-y-6 block">
+
+            <!-- 資金總覽卡片區 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <!-- 主保險箱卡片 (含成就系統) -->
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 p-6 opacity-20">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="text-blue-100 font-medium text-sm flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-blue-300 mr-2"></span> 主要保險箱
+                            </div>
+                            <button onclick="openDetailsModal('safe')" class="text-xs font-bold bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors">明細</button>
+                        </div>
+                        <div class="text-4xl sm:text-5xl font-black tracking-tight mb-6">
+                            <span class="text-2xl text-blue-300 mr-1">$</span><span id="dash-safe-total">0</span>
+                        </div>
+
+                        <!-- 儲蓄成就進度條 -->
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mt-2 border border-white/10">
+                            <div class="flex justify-between items-center text-xs sm:text-sm mb-2">
+                                <div class="font-bold flex items-center text-amber-300">
+                                    🏆 等級: Lv.<span id="user-level" class="text-base ml-1">0</span>
+                                </div>
+                                <div class="text-blue-200">
+                                    目標: $<span id="user-goal-display">100,000</span>
+                                </div>
+                            </div>
+                            <div class="w-full bg-black/20 rounded-full h-2.5 overflow-hidden">
+                                <div id="goal-progress-bar" class="bg-gradient-to-r from-blue-300 to-amber-300 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                            <div class="text-[10px] text-blue-200 mt-1 text-right" id="goal-remaining-text">
+                                尚欠 $100,000 達標
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 臨時存錢筒卡片 -->
+                <div class="bg-white rounded-3xl p-6 sm:p-8 text-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-6 text-slate-100 group-hover:scale-110 transition-transform duration-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-1">
+                                <div class="text-slate-400 font-medium text-sm flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> 臨時存錢筒 (零錢)
+                                </div>
+                                <button onclick="openDetailsModal('temp')" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full transition-colors text-slate-600">明細</button>
+                            </div>
+                            <div class="text-4xl sm:text-5xl font-black tracking-tight mb-6">
+                                <span class="text-2xl text-slate-300 mr-1">$</span><span id="dash-temp-total">0</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="switchTab('temp', 'deposit')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 px-4 py-3 rounded-xl text-sm font-bold transition-colors flex-1 flex justify-center items-center">
+                                存入散紙
+                            </button>
+                            <button onclick="executeTransferToSafe()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-3 rounded-xl text-sm font-bold transition-colors flex-1 flex justify-center items-center">
+                                結算至保險箱
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近動態 -->
+            <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+                <div class="p-5 sm:p-6 border-b border-slate-50 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-slate-800">最近動態</h2>
+                    <button onclick="switchTab('history')" class="text-sm text-blue-600 font-bold hover:text-blue-700">查看全部</button>
+                </div>
+                <div id="home-history-list" class="divide-y divide-slate-50 p-2 sm:p-4"></div>
+            </div>
+        </div>
+
+        <!-- ==================== 保險箱管理 Safe ==================== -->
+        <div id="view-safe" class="fade-in space-y-6 hidden-view">
+            <div class="text-center mb-6 mt-4">
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">主保險箱管理</h2>
+                <p class="text-sm text-slate-500 mt-1.5">存入、提取 或 定期盤點校對</p>
+            </div>
+
+            <!-- 3模式 控制面板 (UI升級) -->
+            <div class="bg-white/95 backdrop-blur-xl p-3 sm:p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-16 z-30">
+                <div class="relative w-full md:w-[320px] bg-slate-100/80 p-1.5 rounded-2xl flex items-center">
+                    <div id="safe-toggle-bg" class="absolute w-[calc(33.333%-4px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 toggle-pos-0"></div>
+                    <button onclick="setTxMode('safe', 'deposit')" id="safe-mode-dep" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-emerald-600 transition-colors">存入</button>
+                    <button onclick="setTxMode('safe', 'withdraw')" id="safe-mode-wtd" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors">提取</button>
+                    <button onclick="setTxMode('safe', 'audit')" id="safe-mode-aud" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors">盤點</button>
+                </div>
+                
+                <div class="flex items-center w-full md:w-auto justify-between md:justify-end gap-4 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-2xl border border-slate-100 md:border-none">
+                    <div class="text-left md:text-right flex-1 md:flex-none md:pr-4">
+                        <div id="safe-tx-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">本次總計</div>
+                        <div class="flex items-baseline">
+                            <div id="safe-tx-total" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">$0</div>
+                            <div id="safe-audit-diff" class="text-xs font-bold ml-2 hidden"></div>
+                        </div>
+                    </div>
+                    <button onclick="saveTransaction('safe')" id="btn-save-safe" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2">
+                        <span>確認</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="safe-audit-guide" class="hidden bg-blue-50/80 text-blue-800 p-4 sm:p-5 rounded-2xl text-sm font-medium border border-blue-100/50 shadow-sm flex items-start space-x-3">
+                <span class="text-lg">🔍</span>
+                <p class="leading-relaxed">盤點模式：請直接輸入保險箱內<strong>「實際擁有」</strong>的各面額最終數量。系統會自動為您計算差額並修正庫存。</p>
+            </div>
+
+            <div id="safe-input-container" class="space-y-6 pb-8"></div>
+        </div>
+
+        <!-- ==================== 臨時存錢 Temp ==================== -->
+        <div id="view-temp" class="fade-in space-y-6 hidden-view">
+            <div class="text-center mb-6 mt-4">
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">臨時存錢筒</h2>
+                <p class="text-sm text-slate-500 mt-1.5">隨手放入零碎金錢，月尾一鍵結算</p>
+            </div>
+
+            <div class="bg-amber-50/80 border border-amber-100/60 rounded-[2rem] p-5 sm:p-6 flex flex-col sm:flex-row justify-between items-center gap-5 shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-amber-200/50 rounded-full flex items-center justify-center text-amber-600 shadow-inner"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 9 3-3 3 3"/><path d="M5 6v14"/><path d="m22 15-3 3-3-3"/><path d="M19 18V4"/></svg></div>
+                    <div>
+                        <div class="text-sm font-bold text-amber-900 tracking-wide mb-0.5">一鍵轉移功能</div>
+                        <div class="text-xs text-amber-700/80 font-medium">將存錢筒內 <span id="temp-transfer-amount" class="font-black text-amber-600 text-sm">$0</span> 全數轉入保險箱</div>
+                    </div>
+                </div>
+                <button onclick="executeTransferToSafe()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-8 py-3.5 rounded-xl text-sm font-bold transition-all shadow-lg hover:shadow-xl active:scale-95">結算至保險箱</button>
+            </div>
+
+            <!-- 控制面板 (UI升級) -->
+            <div class="bg-white/95 backdrop-blur-xl p-3 sm:p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-16 z-30">
+                <div class="relative w-full md:w-[240px] bg-slate-100/80 p-1.5 rounded-2xl flex items-center">
+                    <div id="temp-toggle-bg" class="absolute w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 toggle-pos-0"></div>
+                    <button onclick="setTxMode('temp', 'deposit')" id="temp-mode-dep" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-emerald-600 transition-colors">存入</button>
+                    <button onclick="setTxMode('temp', 'withdraw')" id="temp-mode-wtd" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors">提取</button>
+                </div>
+                
+                <div class="flex items-center w-full md:w-auto justify-between md:justify-end gap-4 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-2xl border border-slate-100 md:border-none">
+                    <div class="text-left md:text-right flex-1 md:flex-none md:pr-4">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">本次總計</div>
+                        <div id="temp-tx-total" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">$0</div>
+                    </div>
+                    <button onclick="saveTransaction('temp')" id="btn-save-temp" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2">
+                        <span>確認</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="temp-input-container" class="space-y-6 pb-8"></div>
+        </div>
+
+        <!-- ==================== 歷史紀錄 History ==================== -->
+        <div id="view-history" class="fade-in space-y-6 hidden-view">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-black text-slate-800">所有紀錄</h2>
+                <p class="text-sm text-slate-500 mt-1">包含保險箱與臨時存錢筒的完整明細</p>
+            </div>
+            <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden min-h-[50vh]">
+                <div id="full-history-container" class="divide-y divide-slate-50"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== 底部導航 ==================== -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-slate-100 pb-safe z-40 sm:hidden">
+        <div class="flex justify-around items-center h-16 px-2">
+            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center w-full h-full nav-active transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span class="text-[10px] mt-1 font-medium">首頁</span>
+            </button>
+            <button onclick="switchTab('safe')" id="nav-safe" class="flex flex-col items-center justify-center w-full h-full nav-inactive transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                <span class="text-[10px] mt-1 font-medium">保險箱</span>
+            </button>
+            <button onclick="switchTab('temp')" id="nav-temp" class="flex flex-col items-center justify-center w-full h-full nav-inactive transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span class="text-[10px] mt-1 font-medium">存錢筒</span>
+            </button>
+            <button onclick="switchTab('history')" id="nav-history" class="flex flex-col items-center justify-center w-full h-full nav-inactive transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                <span class="text-[10px] mt-1 font-medium">紀錄</span>
+            </button>
+        </div>
+    </nav>
+    <div class="hidden sm:flex fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white rounded-full px-2 py-2 shadow-xl z-40 items-center space-x-1">
+        <button onclick="switchTab('home')" id="nav-desk-home" class="px-5 py-2 rounded-full text-sm font-bold bg-white/20 transition-all">首頁</button>
+        <button onclick="switchTab('safe')" id="nav-desk-safe" class="px-5 py-2 rounded-full text-sm font-bold text-slate-400 hover:text-white hover:bg-white/10 transition-all">主保險箱</button>
+        <button onclick="switchTab('temp')" id="nav-desk-temp" class="px-5 py-2 rounded-full text-sm font-bold text-slate-400 hover:text-white hover:bg-white/10 transition-all">臨時存錢筒</button>
+        <button onclick="switchTab('history')" id="nav-desk-history" class="px-5 py-2 rounded-full text-sm font-bold text-slate-400 hover:text-white hover:bg-white/10 transition-all">歷史紀錄</button>
+    </div>
+
+    <!-- ==================== Modals ==================== -->
+
+    <!-- 設定 Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 modal-leave">
+        <div class="modal-content bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm shadow-2xl">
+            <h3 class="text-xl font-black text-slate-800 mb-4">⚙️ 系統設定</h3>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-2">儲蓄目標金額 (用作計算等級)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 font-bold text-slate-400">$</span>
+                        <input type="number" id="setting-goal" value="100000" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-8 pr-4 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeSettingsModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl">取消</button>
+                <button onclick="saveSettings()" class="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-md">儲存設定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 庫存明細 / 結算 / 刪除 Modals... (與之前相似，為節省空間共用樣式) -->
+    <div id="details-modal" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center transition-all duration-300 modal-leave"><div class="modal-content bg-white w-full sm:max-w-md sm:rounded-3xl rounded-t-[2rem] p-6 max-h-[85vh] flex flex-col shadow-2xl transition-transform duration-300"><div class="flex justify-between items-center mb-6"><div><h3 id="details-title" class="text-xl font-black text-slate-800">庫存明細</h3></div><button onclick="closeDetailsModal()" class="bg-slate-50 hover:bg-slate-100 text-slate-400 p-2 rounded-full transition-colors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div><div id="details-content" class="overflow-y-auto no-scrollbar flex-1 pb-4"></div></div></div>
+    
+    <div id="transfer-modal" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 modal-leave"><div class="modal-content bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mx-auto mb-4"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 9 3-3 3 3"/><path d="M5 6v14"/><path d="m22 15-3 3-3-3"/><path d="M19 18V4"/></svg></div><h3 class="text-xl font-black text-slate-800 mb-2">確定結算？</h3><p class="text-sm text-slate-500 mb-6">將存錢筒內 <span id="transfer-modal-amount" class="font-bold text-slate-800"></span> 轉移到主保險箱。</p><div class="flex space-x-3"><button onclick="closeTransferModal()" class="flex-1 py-3 bg-slate-50 text-slate-600 font-bold rounded-xl">取消</button><button onclick="confirmTransfer()" class="flex-1 py-3 bg-slate-800 text-white font-bold rounded-xl">確認結算</button></div></div></div>
+
+    <div id="delete-modal" class="fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 modal-leave"><div class="modal-content bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center"><div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-4"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></div><h3 class="text-xl font-black text-slate-800 mb-2">刪除紀錄？</h3><p class="text-sm text-slate-500 mb-6">將影響目前庫存總額，確定繼續？</p><div class="flex space-x-3"><button onclick="closeDeleteModal()" class="flex-1 py-3 bg-slate-50 text-slate-600 font-bold rounded-xl">取消</button><button onclick="executeDelete()" class="flex-1 py-3 bg-rose-500 text-white font-bold rounded-xl">確認刪除</button></div></div></div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-20 left-1/2 z-[70] transition-all duration-300 toast-leave flex items-center space-x-2 px-5 py-3 rounded-full shadow-lg font-bold text-sm text-white bg-slate-800"><span id="toast-icon"></span><span id="toast-msg">提示</span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const userConfig = { apiKey: "AIzaSyBl0I6EpJJhddSlzhr1lT39VjnW7dTJbxM", authDomain: "securitybox-f0419.firebaseapp.com", projectId: "securitybox-f0419", storageBucket: "securitybox-f0419.firebasestorage.app", messagingSenderId: "390039819652", appId: "1:390039819652:web:328a546b6e1d376ada79d1" };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userConfig;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'securitybox-v3';
+
+        // 50句港式理財金句
+        const SLOGANS = [
+            "慳啲啦！錢唔係從天而降㗎！", "少飲杯凍飲，買樓唔使等。", "出糧第一件事係儲錢，唔係清購物車！", "今日慳一蚊，聽日多一蚊。", "唔好成日諗住換新手機，舊嗰部仲用到！",
+            "睇住個戶口數字大，好過睇住個衣櫃滿。", "買嘢前問下自己：係需要定係想要？", "財息兼收，好過日日擔憂。", "積少成多，散紙都可以變金牛。", "出街食少餐，荷包脹一圈。",
+            "買名牌唔會令你富有，戶口有錢先係真有錢。", "投資自己，回報最高。", "月光族係冇前途㗎，醒吓啦！", "唔好借錢消費，利息好襟計！", "未有耐退得休，而家仲唔努力儲？",
+            "計住計住，好過日後冇得計。", "大富由天，小富由儉。", "唔好見平就買，用唔著都係嘥氣。", "儲錢就係為咗將來有得揀。", "今日忍下手，聽日有錢守。",
+            "信用卡係方便，唔係免費㗎！", "記住交卡數，遲還罰息好和味。", "多餘嘅訂閱取消晒佢啦，都冇用過！", "錢搵錢，好過人搵錢。", "唔好同人比較物質，比較下大家個保險箱啦。",
+            "無端端又想飲珍珠奶茶？飲水啦健康又慳錢！", "淘寶雖然平，買埋買埋都好驚人。", "睇下你個保險箱，係咪好有安全感呢？", "每儲一萬蚊，距離財務自由又近一步。", "先儲蓄，後消費，呢個係鐵律！",
+            "財不入急門，儲錢要有耐性。", "唔好畀啲限時優惠呃到，冷靜啲！", "你估啲錢識自己繁殖咩？要靠你放收入去㗎！", "與其買個靚銀包，不如畀個銀包裝滿錢。", "日日搭的士，幾時先儲到首期？",
+            "睇戲買飛好啦，爆谷汽水忍下口啦。", "返工咁辛苦，啲錢唔好亂咁fing！", "冇錢就唔好充大頭鬼啦。", "儲蓄係一種習慣，越早開始越好。", "財務自由唔係夢，係靠每日慳返嚟。",
+            "見到靚嘢想買？等三日先，通常都唔會再想買。", "買少件衫，個地球同你個荷包都會多謝你。", "自己帶飯返工，健康又慳錢，一舉兩得。", "唔好睇小嗰一毫子，草草埋埋都有唔少。", "錢係要嚟傍身㗎，唔係要嚟曬命。",
+            "窮唔緊要，最緊要識得理財。", "發達第一步：控制支出！", "你個保險箱仲有好多空位，努力啲填滿佢！", "每一次忍住唔買，都係一次勝利！", "錢唔係萬能，但冇錢就萬萬不能！"
+        ];
+
+        window.changeSlogan = function() {
+            const text = SLOGANS[Math.floor(Math.random() * SLOGANS.length)];
+            const el = document.getElementById('slogan-text');
+            if (el) {
+                el.style.opacity = 0;
+                setTimeout(() => { el.innerText = text; el.style.opacity = 1; }, 200);
+            }
+        }
+        changeSlogan();
+
+        const DENOMINATIONS = [
+            { id: 'n1000', value: 1000, type: 'note', label: '$1,000', name: '金牛', color: 'text-amber-600 bg-amber-100' },
+            { id: 'n500', value: 500, type: 'note', label: '$500', name: '大牛', color: 'text-amber-800 bg-amber-200' },
+            { id: 'n100', value: 100, type: 'note', label: '$100', name: '紅衫魚', color: 'text-rose-600 bg-rose-100' },
+            { id: 'n50', value: 50, type: 'note', label: '$50', name: '青蟹', color: 'text-emerald-600 bg-emerald-100' },
+            { id: 'n20', value: 20, type: 'note', label: '$20', name: '藍色', color: 'text-blue-600 bg-blue-100' },
+            { id: 'n10', value: 10, type: 'note', label: '$10', name: '花蟹', color: 'text-indigo-600 bg-indigo-100' },
+            { id: 'c10', value: 10, type: 'coin', label: '$10', color: 'text-amber-700 bg-slate-100 ring-2 ring-amber-300' },
+            { id: 'c5', value: 5, type: 'coin', label: '$5', color: 'text-slate-700 bg-slate-200 ring-2 ring-slate-300' },
+            { id: 'c2', value: 2, type: 'coin', label: '$2', color: 'text-slate-700 bg-slate-100 border border-slate-300' },
+            { id: 'c1', value: 1, type: 'coin', label: '$1', color: 'text-slate-700 bg-slate-100 border border-slate-300' },
+            { id: 'c05', value: 0.5, type: 'coin', label: '5毫', color: 'text-amber-700 bg-amber-100 border border-amber-200' },
+            { id: 'c02', value: 0.2, type: 'coin', label: '2毫', color: 'text-amber-700 bg-amber-100 border border-amber-200' },
+            { id: 'c01', value: 0.1, type: 'coin', label: '1毫', color: 'text-amber-700 bg-amber-100 border border-amber-200' }
+        ];
+
+        let currentUser = null;
+        let transactions = []; 
+        let safeInventory = {}, safeTotal = 0;
+        let tempInventory = {}, tempTotal = 0;
+        let targetGoal = 100000;
+
+        let modes = { safe: 'deposit', temp: 'deposit' }; // safe can be deposit, withdraw, audit
+        let inputs = { safe: {}, temp: {} };
+
+        function resetInputs(wallet) { DENOMINATIONS.forEach(d => inputs[wallet][d.id] = 0); }
+        resetInputs('safe'); resetInputs('temp');
+
+        window.showToast = function(msg, type = 'success') {
+            const t = document.getElementById('toast'), i = document.getElementById('toast-icon');
+            document.getElementById('toast-msg').innerText = msg;
+            if (type === 'error') {
+                t.className = 'fixed top-20 left-1/2 z-[70] transition-all duration-300 toast-enter flex items-center space-x-2 px-5 py-3 rounded-full shadow-lg font-bold text-sm text-white bg-rose-500';
+                i.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+            } else {
+                t.className = 'fixed top-20 left-1/2 z-[70] transition-all duration-300 toast-enter flex items-center space-x-2 px-5 py-3 rounded-full shadow-lg font-bold text-sm text-white bg-slate-800';
+                i.innerHTML = `<svg class="text-emerald-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`;
+            }
+            setTimeout(() => { t.classList.replace('toast-enter', 'toast-leave'); }, 3000);
+        }
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
+            } catch (e) { console.error(e); }
+        }
+        initAuth();
+
+        let unsubscribeSnapshot = null;
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user; updateAuthUI();
+            if (user) {
+                // 讀取設定
+                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'main');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().targetGoal) {
+                    targetGoal = docSnap.data().targetGoal;
+                    document.getElementById('setting-goal').value = targetGoal;
+                }
+
+                if (unsubscribeSnapshot) unsubscribeSnapshot();
+                const q = collection(db, 'artifacts', appId, 'users', user.uid, 'transactions');
+                unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+                    transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    transactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    calculateInventory(); updateDashboardUI(); renderAllInputs(); renderHistory();
+                });
+            } else {
+                transactions = []; calculateInventory(); updateDashboardUI(); renderHistory();
+            }
+        });
+
+        window.loginWithGoogle = async function() {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); showToast("登入成功！"); } 
+            catch (e) { showToast("登入取消", "error"); }
+        }
+        window.logout = async function() { await signOut(auth); showToast("已登出"); }
+        
+        function updateAuthUI() {
+            const userDetails = document.getElementById('user-details-text');
+            const authAction = document.getElementById('auth-action-btn');
+            if (!userDetails || !authAction) return;
+
+            if (currentUser && !currentUser.isAnonymous) {
+                userDetails.innerHTML = `<span class="font-bold mr-2 text-white truncate">${currentUser.displayName || '使用者'}</span><span class="text-slate-400 truncate">${currentUser.email || ''}</span>`;
+                authAction.innerHTML = `<button onclick="logout()" class="text-slate-300 hover:text-white transition-colors bg-slate-700/50 px-3 py-1 rounded">登出</button>`;
+            } else {
+                userDetails.innerHTML = `<span class="text-slate-400 truncate">訪客模式 (資料僅暫存本機)</span>`;
+                authAction.innerHTML = `<button onclick="loginWithGoogle()" class="text-white font-bold bg-blue-600 hover:bg-blue-500 transition-colors px-3 py-1 rounded shadow-sm">Google 登入</button>`;
+            }
+        }
+
+        function calculateInventory() {
+            DENOMINATIONS.forEach(d => { safeInventory[d.id] = 0; tempInventory[d.id] = 0; });
+            safeTotal = 0; tempTotal = 0;
+
+            const sortedTx = [...transactions].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            sortedTx.forEach(tx => {
+                const w = tx.wallet || 'safe';
+                DENOMINATIONS.forEach(item => {
+                    const cnt = tx.counts[item.id] || 0;
+                    if (cnt === 0) return;
+                    
+                    if (tx.type === 'transfer_to_safe') {
+                        safeInventory[item.id] += cnt; safeTotal += cnt * item.value;
+                        tempInventory[item.id] -= cnt; tempTotal -= cnt * item.value;
+                    } else if (tx.type === 'audit' && w === 'safe') {
+                        // audit saves the delta. So just add it.
+                        safeInventory[item.id] += cnt; safeTotal += cnt * item.value;
+                    } else if (w === 'safe') {
+                        if (tx.type === 'deposit') { safeInventory[item.id] += cnt; safeTotal += cnt * item.value; }
+                        else { safeInventory[item.id] -= cnt; safeTotal -= cnt * item.value; }
+                    } else if (w === 'temp') {
+                        if (tx.type === 'deposit') { tempInventory[item.id] += cnt; tempTotal += cnt * item.value; }
+                        else { tempInventory[item.id] -= cnt; tempTotal -= cnt * item.value; }
+                    }
+                });
+            });
+            DENOMINATIONS.forEach(d => { 
+                if(safeInventory[d.id] < 0) safeInventory[d.id] = 0; 
+                if(tempInventory[d.id] < 0) tempInventory[d.id] = 0; 
+            });
+        }
+
+        // --- Settings Modal ---
+        window.openSettingsModal = function() { document.getElementById('settings-modal').classList.replace('modal-leave', 'modal-enter'); }
+        window.closeSettingsModal = function() { document.getElementById('settings-modal').classList.replace('modal-enter', 'modal-leave'); }
+        window.saveSettings = async function() {
+            if (!currentUser) return showToast("請先登入", "error");
+            const val = parseInt(document.getElementById('setting-goal').value, 10);
+            if(isNaN(val) || val <= 0) return showToast("請輸入有效數字", "error");
+            try {
+                targetGoal = val;
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'main'), { targetGoal });
+                updateDashboardUI(); closeSettingsModal(); showToast("設定已儲存");
+            } catch(e) { showToast("儲存失敗", "error"); }
+        }
+
+        // --- Mode toggles & Inputs ---
+        window.setTxMode = function(wallet, mode) {
+            modes[wallet] = mode;
+            
+            const isDep = mode === 'deposit';
+            const isWtd = mode === 'withdraw';
+            const isAud = mode === 'audit';
+
+            if (wallet === 'safe') {
+                const bg = document.getElementById('safe-toggle-bg');
+                const btnDep = document.getElementById('safe-mode-dep');
+                const btnWtd = document.getElementById('safe-mode-wtd');
+                const btnAud = document.getElementById('safe-mode-aud');
+                const btnSave = document.getElementById('btn-save-safe');
+                const guide = document.getElementById('safe-audit-guide');
+
+                bg.className = `absolute w-[calc(33.333%-4px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 ${isDep ? 'toggle-pos-0' : (isWtd ? 'toggle-pos-1' : 'toggle-pos-2')}`;
+                
+                btnDep.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isDep?'text-emerald-600':'text-slate-400'}`;
+                btnWtd.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isWtd?'text-rose-600':'text-slate-400'}`;
+                btnAud.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isAud?'text-blue-600':'text-slate-400'}`;
+                
+                if(isDep) btnSave.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                else if(isWtd) btnSave.className = 'bg-rose-500 hover:bg-rose-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-rose-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                else btnSave.className = 'bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-blue-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+
+                if(isAud) {
+                    guide.classList.remove('hidden');
+                    document.getElementById('safe-tx-label').innerText = '盤點後總庫存';
+                    // Auto fill with current inventory
+                    DENOMINATIONS.forEach(d => inputs.safe[d.id] = safeInventory[d.id]);
+                    document.getElementById('safe-audit-diff').classList.remove('hidden');
+                } else {
+                    guide.classList.add('hidden');
+                    document.getElementById('safe-tx-label').innerText = '本次總計';
+                    resetInputs('safe');
+                    document.getElementById('safe-audit-diff').classList.add('hidden');
+                }
+            } else {
+                // Temp wallet only has dep/wtd
+                const bg = document.getElementById('temp-toggle-bg');
+                const btnDep = document.getElementById('temp-mode-dep');
+                const btnWtd = document.getElementById('temp-mode-wtd');
+                const btnSave = document.getElementById('btn-save-temp');
+                
+                bg.className = `absolute w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 ${isDep ? 'toggle-pos-0' : 'toggle-pos-1'}`;
+                btnDep.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isDep?'text-emerald-600':'text-slate-400'}`;
+                btnWtd.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isWtd?'text-rose-600':'text-slate-400'}`;
+                
+                if(isDep) btnSave.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                else btnSave.className = 'bg-rose-500 hover:bg-rose-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-rose-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                resetInputs('temp');
+            }
+            updateFormTotal(wallet);
+            renderInputGrid(wallet);
+        }
+
+        function updateFormTotal(wallet) {
+            let total = 0;
+            DENOMINATIONS.forEach(item => {
+                const count = inputs[wallet][item.id] || 0;
+                total += count * item.value;
+                const subEl = document.getElementById(`${wallet}-sub-${item.id}`);
+                if(subEl) {
+                    if (modes[wallet] === 'audit') {
+                        const diff = count - safeInventory[item.id];
+                        if(diff === 0) subEl.innerHTML = `<span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">無誤差</span>`;
+                        else if(diff > 0) subEl.innerHTML = `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">多 ${diff}</span>`;
+                        else subEl.innerHTML = `<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md">少 ${Math.abs(diff)}</span>`;
+                    } else {
+                        if (count > 0) subEl.innerHTML = `<span class="text-sm font-black ${modes[wallet]==='deposit'?'text-emerald-500':'text-rose-500'}">$${(count * item.value).toLocaleString()}</span>`;
+                        else subEl.innerHTML = '';
+                    }
+                }
+            });
+
+            const totalEl = document.getElementById(`${wallet}-tx-total`);
+            if (modes[wallet] === 'audit') {
+                totalEl.innerText = '$' + total.toLocaleString();
+                totalEl.className = 'text-2xl sm:text-3xl font-black text-blue-600 leading-none';
+                
+                const diffEl = document.getElementById('safe-audit-diff');
+                if (diffEl) {
+                    const diffTotal = total - safeTotal;
+                    if(diffTotal === 0) { diffEl.innerText = '(無誤差)'; diffEl.className = 'text-xs font-bold ml-2 text-slate-400'; }
+                    else if(diffTotal > 0) { diffEl.innerText = `(+ $${diffTotal.toLocaleString()})`; diffEl.className = 'text-xs font-bold ml-2 text-emerald-500'; }
+                    else { diffEl.innerText = `(- $${Math.abs(diffTotal).toLocaleString()})`; diffEl.className = 'text-xs font-bold ml-2 text-rose-500'; }
+                }
+
+            } else {
+                totalEl.innerText = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 1});
+                totalEl.className = `text-2xl sm:text-3xl font-black ${modes[wallet]==='deposit'?'text-emerald-500':'text-rose-500'} leading-none`;
+            }
+        }
+
+        window.changeCount = function(wallet, id, delta) {
+            let val = (inputs[wallet][id] || 0) + delta;
+            val = Math.max(0, val);
+            if (modes[wallet] === 'withdraw') {
+                const max = (wallet === 'safe') ? safeInventory[id] : tempInventory[id];
+                if (val > (max||0)) { showToast(`庫存僅剩 ${max||0}`, "error"); val = max || 0; }
+            }
+            inputs[wallet][id] = val; document.getElementById(`${wallet}-inp-${id}`).value = val;
+            updateFormTotal(wallet); renderInputGrid(wallet); // Need to re-render to update disabled button states properly
+        }
+        window.handleInput = function(wallet, id, e) {
+            let val = parseInt(e.target.value, 10);
+            val = isNaN(val) ? 0 : Math.max(0, val);
+            if (modes[wallet] === 'withdraw') {
+                const max = (wallet === 'safe') ? safeInventory[id] : tempInventory[id];
+                if (val > (max||0)) { val = max || 0; e.target.value = val; showToast("超過庫存", "error"); }
+            }
+            inputs[wallet][id] = val; updateFormTotal(wallet); renderInputGrid(wallet);
+        }
+
+        function renderInputGrid(wallet) {
+            const container = document.getElementById(`${wallet}-input-container`);
+            const currentMode = modes[wallet];
+            let modeThemeColor = currentMode === 'deposit' ? 'bg-emerald-500' : (currentMode === 'withdraw' ? 'bg-rose-500' : 'bg-blue-500');
+
+            let html = `
+            <div class="flex items-center mb-4 mt-6 px-1">
+                <div class="w-1.5 h-6 bg-slate-300 rounded-full mr-3 shadow-inner"></div>
+                <h3 class="font-black text-slate-800 text-lg tracking-wide">紙幣 Banknotes</h3>
+            </div>
+            <div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-8">`;
+            
+            DENOMINATIONS.filter(d => d.type === 'note').forEach(item => {
+                const avail = (wallet === 'safe') ? (safeInventory[item.id]||0) : (tempInventory[item.id]||0);
+                const isLimit = currentMode === 'withdraw' && (inputs[wallet][item.id]||0) >= avail;
+                const availHtml = (currentMode === 'withdraw' || currentMode === 'audit') ? `<div class="text-[10px] font-bold text-slate-500 mt-1 bg-slate-100 px-2 py-0.5 rounded flex inline-flex items-center"><svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> 庫存: ${avail}</div>` : '';
+                
+                html += `
+                <div class="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+                    <div class="flex justify-between items-start mb-5">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="w-[3.5rem] h-8 rounded-lg flex items-center justify-center font-black text-sm ${item.color} shadow-sm border border-white/50 transform group-hover:scale-105 transition-transform duration-300">${item.label}</div>
+                            <div>
+                                <div class="text-[15px] font-black text-slate-700 leading-tight">${item.name}</div>
+                                ${availHtml}
+                            </div>
+                        </div>
+                        <div id="${wallet}-sub-${item.id}" class="text-right min-h-[1.5rem] flex items-center"></div>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-50/80 border border-slate-100 p-1.5 rounded-2xl group-hover:bg-slate-50 transition-colors">
+                        <button onclick="changeCount('${wallet}','${item.id}',-1)" class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 shadow-sm hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center transition-all active:scale-95"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+                        <input type="number" id="${wallet}-inp-${item.id}" value="${inputs[wallet][item.id]||0}" oninput="handleInput('${wallet}','${item.id}', event)" class="w-16 text-center font-black text-xl text-slate-800 bg-transparent focus:outline-none p-0">
+                        <button onclick="changeCount('${wallet}','${item.id}',1)" class="w-10 h-10 rounded-xl ${isLimit?'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-200':(modeThemeColor + ' text-white shadow-md active:scale-95 hover:opacity-90')} flex items-center justify-center transition-all" ${isLimit?'disabled':''}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+                    </div>
+                </div>`;
+            });
+
+            html += `
+            </div>
+            <div class="flex items-center mb-4 mt-2 px-1">
+                <div class="w-1.5 h-6 bg-slate-300 rounded-full mr-3 shadow-inner"></div>
+                <h3 class="font-black text-slate-800 text-lg tracking-wide">硬幣 Coins</h3>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">`;
+            
+            DENOMINATIONS.filter(d => d.type === 'coin').forEach(item => {
+                const avail = (wallet === 'safe') ? (safeInventory[item.id]||0) : (tempInventory[item.id]||0);
+                const isLimit = currentMode === 'withdraw' && (inputs[wallet][item.id]||0) >= avail;
+                const availHtml = (currentMode === 'withdraw' || currentMode === 'audit') ? `<div class="text-[10px] font-bold text-slate-500 mt-1 bg-slate-100 px-2 py-0.5 rounded inline-flex items-center"><svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> ${avail}</div>` : '';
+                
+                html += `
+                <div class="bg-white/80 backdrop-blur-sm border border-slate-100 rounded-[1.5rem] p-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-lg transition-all duration-300 flex flex-col group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] ${item.color} shadow-sm transform group-hover:scale-110 transition-transform duration-300">${item.label}</div>
+                        <div id="${wallet}-sub-${item.id}" class="h-4 flex items-center"></div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-black text-slate-700 leading-tight">${item.value>=1?item.value+'元':item.label}</div>
+                        ${availHtml}
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-50/80 border border-slate-100 p-1.5 rounded-2xl mt-auto pt-1.5 group-hover:bg-slate-50 transition-colors" style="margin-top: 1rem;">
+                        <button onclick="changeCount('${wallet}','${item.id}',-1)" class="w-8 h-8 rounded-[10px] bg-white border border-slate-200 text-slate-500 shadow-sm hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center transition-all active:scale-95"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+                        <input type="number" id="${wallet}-inp-${item.id}" value="${inputs[wallet][item.id]||0}" oninput="handleInput('${wallet}','${item.id}', event)" class="w-12 text-center font-black text-lg text-slate-800 bg-transparent focus:outline-none p-0">
+                        <button onclick="changeCount('${wallet}','${item.id}',1)" class="w-8 h-8 rounded-[10px] ${isLimit?'bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed':(modeThemeColor + ' text-white shadow-md active:scale-95 hover:opacity-90')} flex items-center justify-center transition-all" ${isLimit?'disabled':''}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+            updateFormTotal(wallet); // Re-call to populate the subtotal elements dynamically created
+        }
+
+        function renderAllInputs() { renderInputGrid('safe'); renderInputGrid('temp'); }
+
+        // --- Save Transaction ---
+        window.saveTransaction = async function(wallet) {
+            if (!currentUser) return showToast("請先登入", "error");
+            
+            const mode = modes[wallet];
+            let deltaCounts = {};
+            let totalDeltaAmount = 0;
+            let hasChange = false;
+
+            if (mode === 'audit') {
+                DENOMINATIONS.forEach(i => {
+                    const diff = inputs[wallet][i.id] - safeInventory[i.id];
+                    deltaCounts[i.id] = diff;
+                    totalDeltaAmount += diff * i.value;
+                    if (diff !== 0) hasChange = true;
+                });
+                if (!hasChange) return showToast("與系統紀錄完全一致，無需修正！");
+            } else {
+                DENOMINATIONS.forEach(i => {
+                    const c = inputs[wallet][i.id] || 0;
+                    deltaCounts[i.id] = c;
+                    totalDeltaAmount += c * i.value;
+                    if (c > 0) hasChange = true;
+                });
+                if (!hasChange) return showToast("請輸入數量", "error");
+            }
+
+            try {
+                const dateStr = new Date().toISOString().split('T')[0];
+                const txId = Date.now().toString();
+
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', txId), {
+                    type: mode, wallet: wallet,
+                    date: dateStr, month: dateStr.substring(0,7),
+                    counts: deltaCounts, amount: totalDeltaAmount, timestamp: new Date().toISOString()
+                });
+                
+                showToast(`✅ 已完成記錄`);
+                if(mode === 'audit') setTxMode('safe', 'deposit'); // Reset to default mode
+                else { resetInputs(wallet); renderInputGrid(wallet); }
+                switchTab('home');
+            } catch (e) { showToast("儲存失敗", "error"); }
+        }
+
+        // --- Transfer Temp to Safe ---
+        window.executeTransferToSafe = function() {
+            if (tempTotal <= 0) return showToast("臨時存錢筒沒有餘額可結算", "error");
+            document.getElementById('transfer-modal-amount').innerText = '$' + tempTotal.toLocaleString(undefined, {minimumFractionDigits:1});
+            document.getElementById('transfer-modal').classList.replace('modal-leave', 'modal-enter');
+        }
+        window.closeTransferModal = function() { document.getElementById('transfer-modal').classList.replace('modal-enter', 'modal-leave'); }
+        window.confirmTransfer = async function() {
+            if (!currentUser) return;
+            try {
+                const txId = Date.now().toString();
+                const dateStr = new Date().toISOString().split('T')[0];
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', txId), {
+                    type: 'transfer_to_safe', wallet: 'temp',
+                    date: dateStr, month: dateStr.substring(0,7),
+                    counts: { ...tempInventory }, amount: tempTotal, timestamp: new Date().toISOString()
+                });
+                closeTransferModal(); showToast("✅ 已成功結算至保險箱！"); switchTab('home');
+            } catch(e) { showToast("結算失敗", "error"); }
+        }
+
+        // --- Update UI ---
+        function updateDashboardUI() {
+            document.getElementById('dash-safe-total').innerText = safeTotal.toLocaleString();
+            document.getElementById('dash-temp-total').innerText = tempTotal.toLocaleString(undefined, {minimumFractionDigits:1});
+            document.getElementById('temp-transfer-amount').innerText = '$' + tempTotal.toLocaleString(undefined, {minimumFractionDigits:1});
+            
+            // Achievement System
+            const level = Math.floor(safeTotal / 10000);
+            document.getElementById('user-level').innerText = level;
+            document.getElementById('user-goal-display').innerText = targetGoal.toLocaleString();
+            
+            let pct = (safeTotal / targetGoal) * 100;
+            if (pct > 100) pct = 100;
+            document.getElementById('goal-progress-bar').style.width = `${pct}%`;
+            
+            if (safeTotal >= targetGoal) {
+                document.getElementById('goal-remaining-text').innerText = "🎉 恭喜已達標！";
+                document.getElementById('goal-remaining-text').className = "text-[10px] text-amber-300 mt-1 text-right font-bold";
+            } else {
+                const rem = targetGoal - safeTotal;
+                document.getElementById('goal-remaining-text').innerText = `尚欠 $${rem.toLocaleString()} 達標`;
+                document.getElementById('goal-remaining-text').className = "text-[10px] text-blue-200 mt-1 text-right";
+            }
+        }
+
+        function renderHistory() {
+            const hList = document.getElementById('home-history-list');
+            const fList = document.getElementById('full-history-container');
+            if (transactions.length === 0) {
+                hList.innerHTML = fList.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">尚無任何紀錄</div>`; return;
+            }
+
+            let htmlH = '', htmlF = '';
+            transactions.forEach((tx, idx) => {
+                let title = '', icon = '', amountColor = '';
+                const isDep = tx.type === 'deposit';
+                let amt = Math.abs(tx.amount).toLocaleString(undefined, {minimumFractionDigits:1});
+                let sign = '';
+
+                if (tx.type === 'transfer_to_safe') {
+                    title = '結算至保險箱'; icon = `<div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 9 3-3 3 3"/><path d="M5 6v14"/><path d="m22 15-3 3-3-3"/><path d="M19 18V4"/></svg></div>`; amountColor = 'text-blue-600'; sign = '+';
+                } else if (tx.type === 'audit') {
+                    title = '盤點修正'; icon = `<div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg></div>`; 
+                    if(tx.amount >= 0) { amountColor = 'text-emerald-500'; sign = '+'; }
+                    else { amountColor = 'text-rose-500'; sign = '-'; }
+                } else if (tx.wallet === 'temp') {
+                    title = isDep ? '散紙存入' : '散紙提取'; icon = isDep ? `<div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>` : `<div class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`; amountColor = isDep ? 'text-amber-500' : 'text-slate-500'; sign = isDep?'+':'-';
+                } else {
+                    title = isDep ? '保險箱存入' : '保險箱提取'; icon = isDep ? `<div class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>` : `<div class="w-10 h-10 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div>`; amountColor = isDep ? 'text-emerald-500' : 'text-rose-500'; sign = isDep?'+':'-';
+                }
+
+                const row = `
+                <div class="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between group">
+                    <div class="flex items-center space-x-3">
+                        ${icon}
+                        <div><div class="font-bold text-sm text-slate-800">${title}</div><div class="text-[10px] text-slate-400">${new Date(tx.timestamp).toLocaleString()}</div></div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="font-black ${amountColor}">${sign}$${amt}</div>
+                        <button onclick="openDeleteModal('${tx.id}')" class="p-1.5 text-slate-300 hover:text-rose-500 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
+                    </div>
+                </div>`;
+                if(idx < 3) htmlH += row; htmlF += row;
+            });
+            hList.innerHTML = htmlH; fList.innerHTML = htmlF;
+        }
+
+        window.openDetailsModal = function(wallet) {
+            const inv = wallet === 'safe' ? safeInventory : tempInventory;
+            const tot = wallet === 'safe' ? safeTotal : tempTotal;
+            document.getElementById('details-title').innerText = wallet === 'safe' ? '主要保險箱明細' : '臨時存錢筒明細';
+            
+            let html = '<div class="space-y-2 mt-4">';
+            DENOMINATIONS.forEach(item => {
+                const cnt = inv[item.id] || 0;
+                if (cnt > 0) {
+                    html += `
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-6 rounded flex justify-center items-center text-[10px] font-bold ${item.color.split(' ')[1]} ${item.color.split(' ')[0]}">${item.label}</div>
+                            <div class="text-sm font-bold text-slate-700">${item.name} <span class="text-slate-400 ml-1">x ${cnt}</span></div>
+                        </div>
+                        <div class="font-black text-slate-800">$${(cnt*item.value).toLocaleString(undefined, {minimumFractionDigits: item.type==='coin'?1:0})}</div>
+                    </div>`;
+                }
+            });
+            html += `</div><div class="mt-4 pt-4 border-t border-slate-100 flex justify-between"><span class="font-bold text-slate-500">總計</span><span class="font-black text-blue-600 text-xl">$${tot.toLocaleString()}</span></div>`;
+            if(tot === 0) html = `<div class="text-center text-slate-400 py-8 text-sm">庫存為空</div>`;
+            
+            document.getElementById('details-content').innerHTML = html;
+            document.getElementById('details-modal').classList.replace('modal-leave', 'modal-enter');
+        }
+        window.closeDetailsModal = function() { document.getElementById('details-modal').classList.replace('modal-enter', 'modal-leave'); }
+
+        let deleteTxId = null;
+        window.openDeleteModal = function(id) { deleteTxId = id; document.getElementById('delete-modal').classList.replace('modal-leave', 'modal-enter'); }
+        window.closeDeleteModal = function() { deleteTxId = null; document.getElementById('delete-modal').classList.replace('modal-enter', 'modal-leave'); }
+        window.executeDelete = async function() {
+            if(!currentUser || !deleteTxId) return;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', deleteTxId)); closeDeleteModal(); showToast("紀錄已刪除"); }
+            catch(e){ showToast("刪除失敗", "error"); }
+        }
+
+        window.switchTab = function(tab, modeAction = null) {
+            ['home', 'safe', 'temp', 'history'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden-view');
+                const mNav = document.getElementById(`nav-${t}`);
+                if(mNav) { mNav.classList.remove('nav-active'); mNav.classList.add('nav-inactive'); }
+                const dNav = document.getElementById(`nav-desk-${t}`);
+                if(dNav) { dNav.className = 'px-5 py-2 rounded-full text-sm font-bold text-slate-400 hover:text-white hover:bg-white/10 transition-all'; }
+            });
+            
+            document.getElementById(`view-${tab}`).classList.remove('hidden-view');
+            const mNavOn = document.getElementById(`nav-${tab}`);
+            if(mNavOn) { mNavOn.classList.remove('nav-inactive'); mNavOn.classList.add('nav-active'); }
+            const dNavOn = document.getElementById(`nav-desk-${tab}`);
+            if(dNavOn) dNavOn.className = 'px-5 py-2 rounded-full text-sm font-bold bg-white/20 text-white transition-all';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (modeAction && (tab === 'safe' || tab === 'temp')) setTxMode(tab, modeAction);
+        }
+
+        // Init Form
+        setTxMode('safe', 'deposit');
+        setTxMode('temp', 'deposit');
+    </script>
+</body>
+</html>
