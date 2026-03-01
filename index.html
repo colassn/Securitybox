@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SafeWealth Pro - 極簡財務管家</title>
+    <!-- PWA 支援標籤 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SafeWealth">
+    <link rel="apple-touch-icon" href="https://api.iconify.design/lucide/wallet.svg?color=%23ffffff&width=192&height=192">
+    <meta name="theme-color" content="#1e293b">
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"SafeWealth Pro","short_name":"SafeWealth","start_url":".","display":"standalone","background_color":"%23f8fafc","theme_color":"%231e293b","icons":[{"src":"https://api.iconify.design/lucide/wallet.svg?color=%231e293b&width=192&height=192","sizes":"192x192","type":"image/svg+xml"},{"src":"https://api.iconify.design/lucide/wallet.svg?color=%231e293b&width=512&height=512","sizes":"512x512","type":"image/svg+xml"}]}'>
+    
     <!-- Tailwind CSS (配置自訂主題變數) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -464,6 +472,18 @@
             }());
         }
 
+        // 🔊 廣東話語音播報引擎
+        function playVoice(text) {
+            if (!window.speechSynthesis) return;
+            // 停止之前的語音，避免重疊
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-HK'; // 設定為廣東話
+            utterance.rate = 1.1;     // 語速稍微快一點點，比較有活力
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
         window.showToast = function(msg, type = 'success') {
             const t = document.getElementById('toast'), i = document.getElementById('toast-icon');
             document.getElementById('toast-msg').innerText = msg;
@@ -875,6 +895,16 @@
                 });
                 
                 showToast(`✅ 已完成記錄`);
+                
+                // 觸發語音播報
+                if (mode === 'deposit') {
+                    playVoice(`勁喎！成功存入 ${totalDeltaAmount} 蚊！`);
+                } else if (mode === 'withdraw') {
+                    playVoice(`提取咗 ${totalDeltaAmount} 蚊，慳啲使啦！`);
+                } else if (mode === 'audit') {
+                    playVoice(`盤點完成，庫存已更新！`);
+                }
+
                 if(hitGoal) { triggerConfetti(); showToast(`🎉 恭喜！${bucketObj.name} 達成目標！`); }
                 if(mode === 'audit') setTxMode('safe', 'deposit'); else { resetInputs(wallet); renderInputGrid(wallet); }
                 switchTab('home');
@@ -903,8 +933,13 @@
                     date: dateStr, month: dateStr.substring(0,7),
                     counts: { ...tempInventory }, amount: tempTotal, timestamp: new Date().toISOString()
                 });
+                
+                const settledAmount = tempTotal; // 保存播報用金額
+                
                 closeTransferModal(); 
                 triggerConfetti(); // 撒花特效！
+                playVoice(`太正啦！成功將 ${settledAmount} 蚊結算至保險箱！`); // 結算語音
+                
                 showToast(`✅ 已成功轉移至 ${bName}`); switchTab('home');
             } catch(e) { showToast("結算失敗", "error"); }
         }
@@ -978,6 +1013,14 @@
 
         // Init Form
         setTxMode('safe', 'deposit'); setTxMode('temp', 'deposit');
+        
+        // PWA Service Worker 註冊 (如果您將此檔案放到伺服器上)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // 如果需要支援 Android 的安裝彈窗，您需要在同一個伺服器加上一個空的 sw.js
+                // navigator.serviceWorker.register('./sw.js'); 
+            });
+        }
     </script>
 </body>
 </html>
