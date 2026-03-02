@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#1e293b">
     <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"SafeWealth Pro","short_name":"SafeWealth","start_url":".","display":"standalone","background_color":"%23f8fafc","theme_color":"%231e293b","icons":[{"src":"https://api.iconify.design/lucide/wallet.svg?color=%231e293b&width=192&height=192","sizes":"192x192","type":"image/svg+xml"},{"src":"https://api.iconify.design/lucide/wallet.svg?color=%231e293b&width=512&height=512","sizes":"512x512","type":"image/svg+xml"}]}'>
     
-    <!-- Tailwind CSS (配置自訂主題變數) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -29,97 +29,51 @@
             }
         }
     </script>
-    <!-- 引入 Canvas Confetti 撒花特效庫 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@300;400;500;700;900&display=swap');
         
-        /* 🎨 主題色彩定義 */
-        :root[data-theme="blue"] {
-            --p-50: #eff6ff; --p-100: #dbeafe; --p-200: #bfdbfe; --p-300: #93c5fd; --p-400: #60a5fa;
-            --p-500: #3b82f6; --p-600: #2563eb; --p-700: #1d4ed8; --p-800: #1e40af; --p-900: #1e3a8a;
-        }
-        :root[data-theme="emerald"] {
-            --p-50: #ecfdf5; --p-100: #d1fae5; --p-200: #a7f3d0; --p-300: #6ee7b7; --p-400: #34d399;
-            --p-500: #10b981; --p-600: #059669; --p-700: #047857; --p-800: #065f46; --p-900: #064e3b;
-        }
-        :root[data-theme="purple"] {
-            --p-50: #faf5ff; --p-100: #f3e8ff; --p-200: #e9d5ff; --p-300: #d8b4fe; --p-400: #c084fc;
-            --p-500: #a855f7; --p-600: #9333ea; --p-700: #7e22ce; --p-800: #6b21a8; --p-900: #581c87;
-        }
-        :root[data-theme="rose"] {
-            --p-50: #fff1f2; --p-100: #ffe4e6; --p-200: #fecdd3; --p-300: #fda4af; --p-400: #fb7185;
-            --p-500: #f43f5e; --p-600: #e11d48; --p-700: #be123c; --p-800: #9f1239; --p-900: #881337;
-        }
+        :root[data-theme="blue"] { --p-50: #eff6ff; --p-100: #dbeafe; --p-200: #bfdbfe; --p-300: #93c5fd; --p-400: #60a5fa; --p-500: #3b82f6; --p-600: #2563eb; --p-700: #1d4ed8; --p-800: #1e40af; --p-900: #1e3a8a; }
+        :root[data-theme="emerald"] { --p-50: #ecfdf5; --p-100: #d1fae5; --p-200: #a7f3d0; --p-300: #6ee7b7; --p-400: #34d399; --p-500: #10b981; --p-600: #059669; --p-700: #047857; --p-800: #065f46; --p-900: #064e3b; }
+        :root[data-theme="purple"] { --p-50: #faf5ff; --p-100: #f3e8ff; --p-200: #e9d5ff; --p-300: #d8b4fe; --p-400: #c084fc; --p-500: #a855f7; --p-600: #9333ea; --p-700: #7e22ce; --p-800: #6b21a8; --p-900: #581c87; }
+        :root[data-theme="rose"] { --p-50: #fff1f2; --p-100: #ffe4e6; --p-200: #fecdd3; --p-300: #fda4af; --p-400: #fb7185; --p-500: #f43f5e; --p-600: #e11d48; --p-700: #be123c; --p-800: #9f1239; --p-900: #881337; }
 
-        body {
-            font-family: 'Noto Sans HK', sans-serif;
-            background-color: #f8fafc;
-            -webkit-tap-highlight-color: transparent; 
-            color: #334155;
-        }
+        body { font-family: 'Noto Sans HK', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; color: #334155; }
+        .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } input[type=number] { -moz-appearance: textfield; }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* ⚡ 動畫優化 */
+        .fade-in { animation: fadeIn 0.15s ease-out forwards; will-change: opacity, transform; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+        .modal-enter { opacity: 1 !important; pointer-events: auto; transition: opacity 0.2s ease-out !important; }
+        .modal-enter .modal-content { transform: translateY(0) scale(1) !important; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important; } 
+        .modal-leave { opacity: 0 !important; pointer-events: none; transition: opacity 0.15s ease-in !important; }
+        .modal-leave .modal-content { transform: translateY(12px) scale(0.95) !important; transition: transform 0.15s ease-in !important; }
 
-        /* 動畫 */
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .toast-enter { transform: translateY(0) translateX(-50%) !important; opacity: 1 !important; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s !important; }
+        .toast-leave { transform: translateY(20px) translateX(-50%) !important; opacity: 0 !important; pointer-events: none !important; transition: all 0.2s ease-in !important; }
 
-        .modal-enter { opacity: 1; pointer-events: auto; }
-        .modal-enter .modal-content { transform: translateY(0) scale(1); }
-        .modal-leave { opacity: 0; pointer-events: none; }
-        .modal-leave .modal-content { transform: translateY(20px) scale(0.95); }
-
-        .toast-enter { transform: translateY(0) translateX(-50%); opacity: 1; }
-        .toast-leave { transform: translateY(20px) translateX(-50%); opacity: 0; pointer-events: none; }
-
-        /* 底部導航自訂樣式 (浮動膠囊) */
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding: 0.4rem 0;
-            border-radius: 9999px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            /* 強制文字不換行 */
-            white-space: nowrap;
-        }
-        .nav-active { 
-            color: var(--p-600); 
-            background-color: var(--p-50); 
-            font-weight: 800; 
-            transform: translateY(-2px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        .nav-inactive { 
-            color: #94a3b8; 
-            transform: translateY(0);
-        }
-        .nav-inactive:hover { 
-            color: #64748b; 
-        }
-        .nav-active svg {
-            stroke-width: 2.5px;
-        }
+        /* 底部導航 */
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 0.4rem 0; border-radius: 9999px; transition: all 0.15s ease-out; white-space: nowrap; }
+        .nav-active { color: var(--p-600); background-color: var(--p-50); font-weight: 800; transform: translateY(-2px); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .nav-inactive { color: #94a3b8; transform: translateY(0); }
+        .nav-inactive:hover { color: #64748b; }
+        .nav-active svg { stroke-width: 2.5px; }
 
         .hidden-view { display: none !important; }
+        .toggle-pos-0 { transform: translateX(0%); } .toggle-pos-1 { transform: translateX(100%); } .toggle-pos-2 { transform: translateX(200%); }
 
-        .toggle-pos-0 { transform: translateX(0%); }
-        .toggle-pos-1 { transform: translateX(100%); }
-        .toggle-pos-2 { transform: translateX(200%); }
-
-        /* 專項儲蓄橫向捲動快照 */
-        .bucket-scroll-container {
-            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 1rem; gap: 1rem;
-        }
+        .bucket-scroll-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 1rem; gap: 1rem; }
         .bucket-card { scroll-snap-align: start; min-width: 85%; max-width: 400px; flex-shrink: 0; }
+
+        /* 👁️ 隱私模糊模式 */
+        .privacy-on .money-blur { filter: blur(8px); transition: filter 0.3s ease; cursor: pointer; user-select: none; }
+        .privacy-on .money-blur:hover, .privacy-on .money-blur:active { filter: blur(0px); }
+        
+        /* 隱藏原生 checkbox */
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #10B981; }
     </style>
 </head>
 <body class="selection:bg-primary-100 pb-24 sm:pb-8 relative overflow-x-hidden min-h-screen flex flex-col transition-colors duration-500">
@@ -159,6 +113,21 @@
         <!-- ==================== 首頁 Dashboard ==================== -->
         <div id="view-home" class="fade-in space-y-6 block">
 
+            <!-- 💰 全局總資產卡片 -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden mt-2">
+                <div class="absolute top-0 right-0 p-4 opacity-10 transform translate-x-4 -translate-y-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                </div>
+                <div class="relative z-10">
+                    <div class="text-slate-300 font-medium text-sm mb-2 tracking-wide flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span> 總資產 (所有保險箱 + 存錢筒)
+                    </div>
+                    <div class="text-4xl sm:text-5xl font-black tracking-tight money-blur inline-block">
+                        <span class="text-2xl text-slate-400 mr-1">$</span><span id="dash-global-total" data-val="0">0</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- 資金總覽：多重保險箱橫向捲動區 -->
             <div>
                 <div class="flex justify-between items-end mb-3 px-1">
@@ -184,7 +153,7 @@
                             </div>
                             <button onclick="event.stopPropagation(); openDetailsModal('temp')" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full transition-colors text-slate-600">明細</button>
                         </div>
-                        <div class="text-4xl sm:text-5xl font-black tracking-tight mb-6">
+                        <div class="text-4xl sm:text-5xl font-black tracking-tight mb-6 money-blur inline-block">
                             <span class="text-2xl text-slate-300 mr-1">$</span><span id="dash-temp-total" data-val="0">0</span>
                         </div>
                     </div>
@@ -216,7 +185,6 @@
                 <p class="text-sm text-slate-500 mt-1.5">選擇帳戶進行存入、提取或盤點</p>
             </div>
 
-            <!-- 選擇操作的帳戶 -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3 sticky top-16 z-40">
                 <div class="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 shrink-0">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
@@ -224,30 +192,28 @@
                 <div class="flex-1">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">目標帳戶</label>
                     <select id="active-bucket-select" onchange="changeActiveBucket()" class="w-full font-black text-slate-800 bg-transparent focus:outline-none appearance-none cursor-pointer text-lg">
-                        <!-- JS 載入 -->
                     </select>
                 </div>
                 <div class="text-slate-400 pointer-events-none shrink-0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
             </div>
 
-            <!-- 3模式 控制面板 -->
             <div class="bg-white/95 backdrop-blur-xl p-3 sm:p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-[120px] z-30">
                 <div class="relative w-full md:w-[320px] bg-slate-100/80 p-1.5 rounded-2xl flex items-center">
-                    <div id="safe-toggle-bg" class="absolute w-[calc(33.333%-4px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 toggle-pos-0"></div>
-                    <button onclick="setTxMode('safe', 'deposit')" id="safe-mode-dep" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-emerald-600 transition-colors">存入</button>
-                    <button onclick="setTxMode('safe', 'withdraw')" id="safe-mode-wtd" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors">提取</button>
-                    <button onclick="setTxMode('safe', 'audit')" id="safe-mode-aud" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors">盤點</button>
+                    <div id="safe-toggle-bg" class="absolute w-[calc(33.333%-4px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-200 toggle-pos-0"></div>
+                    <button onclick="setTxMode('safe', 'deposit')" id="safe-mode-dep" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-emerald-600 transition-colors duration-150">存入</button>
+                    <button onclick="setTxMode('safe', 'withdraw')" id="safe-mode-wtd" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors duration-150">提取</button>
+                    <button onclick="setTxMode('safe', 'audit')" id="safe-mode-aud" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors duration-150">盤點</button>
                 </div>
                 
                 <div class="flex items-center w-full md:w-auto justify-between md:justify-end gap-4 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-2xl border border-slate-100 md:border-none">
                     <div class="text-left md:text-right flex-1 md:flex-none md:pr-4">
                         <div id="safe-tx-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">本次總計</div>
-                        <div class="flex items-baseline">
+                        <div class="flex items-baseline money-blur inline-block">
                             <div id="safe-tx-total" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">$0</div>
                             <div id="safe-audit-diff" class="text-xs font-bold ml-2 hidden"></div>
                         </div>
                     </div>
-                    <button onclick="saveTransaction('safe')" id="btn-save-safe" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2">
+                    <button onclick="saveTransaction('safe')" id="btn-save-safe" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2">
                         <span>確認</span>
                     </button>
                 </div>
@@ -281,17 +247,17 @@
 
             <div class="bg-white/95 backdrop-blur-xl p-3 sm:p-5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-16 z-30">
                 <div class="relative w-full md:w-[240px] bg-slate-100/80 p-1.5 rounded-2xl flex items-center">
-                    <div id="temp-toggle-bg" class="absolute w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 toggle-pos-0"></div>
-                    <button onclick="setTxMode('temp', 'deposit')" id="temp-mode-dep" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-emerald-600 transition-colors">存入</button>
-                    <button onclick="setTxMode('temp', 'withdraw')" id="temp-mode-wtd" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors">提取</button>
+                    <div id="temp-toggle-bg" class="absolute w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-200 toggle-pos-0"></div>
+                    <button onclick="setTxMode('temp', 'deposit')" id="temp-mode-dep" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-emerald-600 transition-colors duration-150">存入</button>
+                    <button onclick="setTxMode('temp', 'withdraw')" id="temp-mode-wtd" class="relative z-10 flex-1 py-2.5 text-sm font-bold text-slate-400 transition-colors duration-150">提取</button>
                 </div>
                 
                 <div class="flex items-center w-full md:w-auto justify-between md:justify-end gap-4 bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-2xl border border-slate-100 md:border-none">
                     <div class="text-left md:text-right flex-1 md:flex-none md:pr-4">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">本次總計</div>
-                        <div id="temp-tx-total" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">$0</div>
+                        <div id="temp-tx-total" class="text-2xl sm:text-3xl font-black text-emerald-500 leading-none money-blur inline-block">$0</div>
                     </div>
-                    <button onclick="saveTransaction('temp')" id="btn-save-temp" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2">
+                    <button onclick="saveTransaction('temp')" id="btn-save-temp" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2">
                         <span>確認</span>
                     </button>
                 </div>
@@ -307,21 +273,18 @@
                 <p class="text-sm text-slate-500 mt-1.5">檢視您目前擁有的所有紙幣與硬幣</p>
             </div>
 
-            <!-- 篩選器與總額 -->
             <div class="bg-white/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-16 z-30">
                 <div class="w-full md:flex-1 bg-slate-50 p-2 rounded-2xl border border-slate-100 flex items-center">
                     <span class="pl-2 pr-1 text-lg">🔍</span>
                     <select id="inventory-filter-select" onchange="changeInventoryFilter()" class="w-full bg-transparent font-bold text-slate-700 focus:outline-none p-2 cursor-pointer appearance-none">
-                        <!-- JS 載入 -->
                     </select>
                 </div>
                 <div class="flex items-center justify-between w-full md:w-auto px-4 md:px-0">
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-4">總庫存額</span>
-                    <span id="inventory-total-display" class="text-3xl font-black text-primary-600 tracking-tight">$0</span>
+                    <span id="inventory-total-display" class="text-3xl font-black text-primary-600 tracking-tight money-blur inline-block">$0</span>
                 </div>
             </div>
 
-            <!-- 庫存清單 -->
             <div id="inventory-list-container" class="pb-8"></div>
         </div>
 
@@ -338,7 +301,7 @@
 
     </main>
 
-    <!-- ==================== 手機版底部導航 (懸浮玻璃膠囊) ==================== -->
+    <!-- ==================== 手機版底部導航 ==================== -->
     <nav class="fixed bottom-6 left-4 right-4 z-50 sm:hidden">
         <div class="bg-white/90 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/80 rounded-full mx-auto max-w-[420px] flex justify-between items-center p-1.5">
             <button onclick="switchTab('home')" id="nav-home" class="nav-item nav-active">
@@ -364,7 +327,7 @@
         </div>
     </nav>
     
-    <!-- ==================== 電腦版底部導航 (質感玻璃浮島) ==================== -->
+    <!-- 電腦版底部導航 -->
     <div class="hidden sm:flex fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white/80 backdrop-blur-2xl text-slate-600 rounded-full p-1.5 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-white z-50 items-center space-x-1">
         <button onclick="switchTab('home')" id="nav-desk-home" class="px-6 py-2.5 rounded-full text-sm font-bold bg-primary-50 text-primary-600 transition-all duration-300 shadow-sm">首頁</button>
         <button onclick="switchTab('safe')" id="nav-desk-safe" class="px-6 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all duration-300">資產管理</button>
@@ -375,40 +338,92 @@
 
     <!-- ==================== Modals ==================== -->
 
-    <!-- 設定 Modal -->
+    <!-- 全新升級 設定 Modal -->
     <div id="settings-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 modal-leave">
-        <div class="modal-content bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+        <div class="modal-content bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-black text-slate-800">⚙️ 系統設定</h3>
-                <button onclick="closeSettingsModal()" class="bg-slate-50 p-2 rounded-full text-slate-500"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                <h3 class="text-xl font-black text-slate-800">⚙️ 系統設定中心</h3>
+                <button onclick="closeSettingsModal()" class="bg-slate-50 p-2 rounded-full text-slate-500 hover:bg-slate-100"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
             </div>
             
-            <div class="space-y-6 mb-8">
-                <!-- 佈景主題 -->
+            <div class="space-y-8 mb-8">
+                <!-- 區塊 1：視覺與音效 -->
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-3">🎨 主題色彩</label>
-                    <div class="flex space-x-4">
-                        <button onclick="selectTheme('blue')" class="w-10 h-10 rounded-full bg-blue-500 ring-offset-2 ring-blue-500 theme-btn focus:ring-2" id="theme-btn-blue"></button>
-                        <button onclick="selectTheme('emerald')" class="w-10 h-10 rounded-full bg-emerald-500 ring-offset-2 ring-emerald-500 theme-btn" id="theme-btn-emerald"></button>
-                        <button onclick="selectTheme('purple')" class="w-10 h-10 rounded-full bg-purple-500 ring-offset-2 ring-purple-500 theme-btn" id="theme-btn-purple"></button>
-                        <button onclick="selectTheme('rose')" class="w-10 h-10 rounded-full bg-rose-500 ring-offset-2 ring-rose-500 theme-btn" id="theme-btn-rose"></button>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">視覺與音效</h4>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-bold text-slate-700">🎨 主題色彩</span>
+                        <div class="flex space-x-3">
+                            <button onclick="selectTheme('blue')" class="w-8 h-8 rounded-full bg-blue-500 ring-offset-2 ring-blue-500 theme-btn focus:ring-2" id="theme-btn-blue"></button>
+                            <button onclick="selectTheme('emerald')" class="w-8 h-8 rounded-full bg-emerald-500 ring-offset-2 ring-emerald-500 theme-btn" id="theme-btn-emerald"></button>
+                            <button onclick="selectTheme('purple')" class="w-8 h-8 rounded-full bg-purple-500 ring-offset-2 ring-purple-500 theme-btn" id="theme-btn-purple"></button>
+                            <button onclick="selectTheme('rose')" class="w-8 h-8 rounded-full bg-rose-500 ring-offset-2 ring-rose-500 theme-btn" id="theme-btn-rose"></button>
+                        </div>
                     </div>
+                    
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">🔊 語音播報提示</span>
+                            <span class="text-[10px] text-slate-400">存取款時用語音讀出金額</span>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="setting-voice" class="sr-only peer" checked onchange="toggleVoice(this.checked)">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </div>
+                    </label>
                 </div>
 
+                <!-- 區塊 2：隱私與安全 -->
                 <div class="border-t border-slate-100 pt-6">
-                    <label class="block text-sm font-bold text-slate-700 mb-3">🎯 多重保險箱 / 專項儲蓄管理</label>
-                    <div id="settings-buckets-list" class="space-y-2 mb-3">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">隱私與安全</h4>
+                    
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">👁️ 隱私模糊模式</span>
+                            <span class="text-[10px] text-slate-400">模糊顯示金額，游標移入才顯示</span>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" id="setting-privacy" class="sr-only peer" onchange="applyPrivacyMode(this.checked)">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- 區塊 3：專項儲蓄管理 -->
+                <div class="border-t border-slate-100 pt-6">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">專項儲蓄帳戶</h4>
+                    <div id="settings-buckets-list" class="space-y-2 mb-3 max-h-32 overflow-y-auto pr-1 no-scrollbar">
                         <!-- JS Render Buckets -->
                     </div>
                     
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                         <input type="text" id="new-bucket-name" placeholder="新專案名稱 (例: 買車基金)" class="w-full bg-transparent border-b border-slate-200 py-2 text-sm font-bold focus:outline-none focus:border-primary-500 mb-2">
                         <input type="number" id="new-bucket-target" placeholder="目標金額 (例: 50000)" class="w-full bg-transparent border-b border-slate-200 py-2 text-sm font-bold focus:outline-none focus:border-primary-500 mb-3">
-                        <button onclick="addBucket()" class="w-full bg-slate-800 text-white text-xs font-bold py-2.5 rounded-lg">+ 新增專項儲蓄</button>
+                        <button onclick="addBucket()" class="w-full bg-slate-800 hover:bg-slate-900 transition-colors text-white text-xs font-bold py-2.5 rounded-lg shadow-sm">+ 新增專項儲蓄</button>
+                    </div>
+                </div>
+
+                <!-- 區塊 4：資料管理 -->
+                <div class="border-t border-slate-100 pt-6">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">資料管理</h4>
+                    <div class="flex flex-col space-y-3">
+                        <button onclick="exportCSV()" class="flex items-center justify-center w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-xl text-sm transition-colors">
+                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            匯出交易紀錄 (CSV)
+                        </button>
+                        <button onclick="clearAllData()" class="flex items-center justify-center w-full py-2.5 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold rounded-xl text-sm transition-colors">
+                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                            清除所有資料 (危險)
+                        </button>
                     </div>
                 </div>
             </div>
-            <button onclick="saveSettings()" class="w-full py-3.5 bg-primary-600 hover:bg-primary-700 transition-colors text-white font-bold rounded-xl shadow-md">儲存變更</button>
+            
+            <!-- 底部儲存按鈕 -->
+            <button onclick="saveSettings()" class="w-full py-3.5 bg-primary-600 hover:bg-primary-700 transition-colors text-white font-bold rounded-xl shadow-md flex justify-center items-center">
+                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                儲存所有變更
+            </button>
         </div>
     </div>
 
@@ -422,7 +437,7 @@
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 9 3-3 3 3"/><path d="M5 6v14"/><path d="m22 15-3 3-3-3"/><path d="M19 18V4"/></svg>
             </div>
             <h3 class="text-xl font-black text-slate-800 mb-2">準備結算轉移</h3>
-            <p class="text-sm text-slate-500 mb-4">將存錢筒內 <span id="transfer-modal-amount" class="font-bold text-slate-800"></span> 轉移到：</p>
+            <p class="text-sm text-slate-500 mb-4">將存錢筒內 <span id="transfer-modal-amount" class="font-bold text-slate-800 money-blur inline-block"></span> 轉移到：</p>
             <select id="transfer-target-bucket" class="w-full bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl font-bold text-slate-800 mb-6 focus:outline-none focus:ring-2 focus:ring-primary-500 text-center cursor-pointer"></select>
             <div class="flex space-x-3">
                 <button onclick="closeTransferModal()" class="flex-1 py-3.5 bg-slate-50 text-slate-600 font-bold rounded-xl">取消</button>
@@ -434,6 +449,21 @@
     <!-- 刪除確認 Modal -->
     <div id="delete-modal" class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 modal-leave"><div class="modal-content bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm shadow-2xl text-center"><div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-4"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></div><h3 class="text-xl font-black text-slate-800 mb-2">刪除紀錄？</h3><p class="text-sm text-slate-500 mb-6">將影響目前庫存總額，確定繼續？</p><div class="flex space-x-3"><button onclick="closeDeleteModal()" class="flex-1 py-3 bg-slate-50 text-slate-600 font-bold rounded-xl">取消</button><button onclick="executeDelete()" class="flex-1 py-3 bg-rose-500 text-white font-bold rounded-xl">確認刪除</button></div></div></div>
 
+    <!-- 💥 清除所有資料確認 Modal (新增) -->
+    <div id="clear-data-modal" class="fixed inset-0 z-[70] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 modal-leave">
+        <div class="modal-content bg-white rounded-3xl p-6 sm:p-8 w-full max-w-sm shadow-2xl text-center">
+            <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-4">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 mb-2">嚴重警告</h3>
+            <p class="text-sm text-slate-500 mb-6">這將會徹底刪除您所有的「交易紀錄」與「庫存數字」。<br><br><span class="font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded">此操作絕對無法復原！</span><br><br>確定要清空所有資料嗎？</p>
+            <div class="flex space-x-3">
+                <button onclick="closeClearDataModal()" class="flex-1 py-3 bg-slate-50 text-slate-600 font-bold rounded-xl hover:bg-slate-100 transition-colors">取消</button>
+                <button onclick="executeClearAllData()" class="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl shadow-lg transition-colors">確認清空</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="fixed top-20 left-1/2 z-[70] transition-all duration-300 toast-leave flex items-center space-x-2 px-5 py-3 rounded-full shadow-lg font-bold text-sm text-white bg-slate-800"><span id="toast-icon"></span><span id="toast-msg">提示</span></div>
 
@@ -443,12 +473,12 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'securitybox-v4';
         const userConfig = { apiKey: "AIzaSyBl0I6EpJJhddSlzhr1lT39VjnW7dTJbxM", authDomain: "securitybox-f0419.firebaseapp.com", projectId: "securitybox-f0419", storageBucket: "securitybox-f0419.firebasestorage.app", messagingSenderId: "390039819652", appId: "1:390039819652:web:328a546b6e1d376ada79d1" };
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : userConfig;
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'securitybox-v4';
 
         const SLOGANS = ["慳啲啦！錢唔係從天而降㗎！", "少飲杯凍飲，買樓唔使等。", "今日慳一蚊，聽日多一蚊。", "買名牌唔會令你富有，戶口有錢先係真有錢。", "儲蓄係一種習慣，越早開始越好。"];
         window.changeSlogan = function() {
@@ -473,20 +503,23 @@
             { id: 'c01', value: 0.1, type: 'coin', label: '1毫', color: 'text-amber-700 bg-amber-100 border border-amber-200' }
         ];
 
-        // === 全域狀態與多重保險箱 ===
+        // === 全域狀態與系統設定 ===
         let currentUser = null;
         let transactions = []; 
         let tempInventory = {}, tempTotal = 0;
         
-        // 預設會有一個主保險箱
         let userBuckets = [{ id: 'safe', name: '主要保險箱', target: 100000 }];
-        let activeBucketId = 'safe'; // 目前選中的保險箱
+        let activeBucketId = 'safe'; 
         
-        // Data Structure: inventories[bucketId][denomiId] = count
         let inventories = {}; 
         let totals = {};
 
+        // 設定檔預設值
         let currentTheme = 'blue';
+        let appSettings = {
+            voiceEnabled: true,
+            privacyMode: false
+        };
 
         let modes = { safe: 'deposit', temp: 'deposit' }; 
         let inputs = { safe: {}, temp: {} };
@@ -494,20 +527,30 @@
         function resetInputs(wallet) { DENOMINATIONS.forEach(d => inputs[wallet][d.id] = 0); }
         resetInputs('safe'); resetInputs('temp');
 
+        function ensureMainBucket() {
+            if (!userBuckets || !Array.isArray(userBuckets)) userBuckets = [];
+            if (!userBuckets.find(b => b.id === 'safe')) {
+                userBuckets.unshift({ id: 'safe', name: '主要保險箱', target: 100000 });
+            }
+        }
+
         // ✨ 數字微動畫引擎
         function animateNum(elementId, endValue, isDecimal = false) {
             const el = document.getElementById(elementId);
             if (!el) return;
             const startValue = parseFloat(el.getAttribute('data-val')) || 0;
-            if (startValue === endValue) return;
             
-            const duration = 1200;
+            if (startValue === endValue) {
+                el.innerText = endValue.toLocaleString(undefined, { minimumFractionDigits: isDecimal?1:0, maximumFractionDigits: 1 });
+                return;
+            }
+            
+            const duration = 450;
             const startTime = performance.now();
 
             function update(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // easeOutQuart
                 const ease = 1 - Math.pow(1 - progress, 4);
                 const current = startValue + (endValue - startValue) * ease;
 
@@ -522,7 +565,7 @@
             requestAnimationFrame(update);
         }
 
-        // ✨ 撒花特效引擎
+        // ✨ 撒花特效
         function triggerConfetti() {
             var duration = 3000;
             var end = Date.now() + duration;
@@ -533,14 +576,14 @@
             }());
         }
 
-        // 🔊 廣東話語音播報引擎
+        // 🔊 語音播報 (結合設定開關)
         function playVoice(text) {
+            if (!appSettings.voiceEnabled) return; // 檢查設定
             if (!window.speechSynthesis) return;
-            // 停止之前的語音，避免重疊
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'zh-HK'; // 設定為廣東話
-            utterance.rate = 1.1;     // 語速稍微快一點點，比較有活力
+            utterance.lang = 'zh-HK';
+            utterance.rate = 1.1;
             utterance.pitch = 1.0;
             window.speechSynthesis.speak(utterance);
         }
@@ -558,39 +601,53 @@
             setTimeout(() => { t.classList.replace('toast-enter', 'toast-leave'); }, 3000);
         }
 
-        async function initAuth() {
-            try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token); else await signInAnonymously(auth); } 
-            catch (e) { console.error(e); }
-        }
-        initAuth();
-
+        // --- Auth & Data Loading ---
         let unsubscribeSnapshot = null;
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user; updateAuthUI();
-            if (user) {
-                const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'main');
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(data.buckets) userBuckets = data.buckets;
-                    if(data.theme) applyTheme(data.theme);
-                }
-                updateSettingsUI();
 
-                if (unsubscribeSnapshot) unsubscribeSnapshot();
-                const q = query(collection(db, 'artifacts', appId, 'users', user.uid, 'transactions'));
-                unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-                    transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    transactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    calculateInventory(); updateDashboardUI(); renderAllInputs(); renderHistory();
-                }, (error) => {
-                    console.error("Firestore error:", error);
-                    showToast("讀取資料失敗，請檢查網路", "error");
-                });
-            } else {
-                transactions = []; calculateInventory(); updateDashboardUI(); renderHistory();
-            }
-        });
+        async function initApp() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) { console.error("Auth init error:", e); }
+            
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                updateAuthUI();
+                
+                if (user) {
+                    updateDashboardUI(); renderAllInputs();
+                    
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'main');
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if(data.buckets && Array.isArray(data.buckets)) userBuckets = data.buckets;
+                            if(data.theme) applyTheme(data.theme);
+                            if(data.voiceEnabled !== undefined) appSettings.voiceEnabled = data.voiceEnabled;
+                            if(data.privacyMode !== undefined) window.applyPrivacyMode(data.privacyMode);
+                        }
+                    } catch(e) { console.error("Settings fetch error:", e); }
+                    
+                    ensureMainBucket();
+                    updateSettingsUI();
+                    
+                    if (unsubscribeSnapshot) unsubscribeSnapshot();
+                    
+                    unsubscribeSnapshot = onSnapshot(query(collection(db, 'artifacts', appId, 'users', user.uid, 'transactions')), (snapshot) => {
+                        transactions = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                        transactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        calculateInventory(); updateDashboardUI(); renderAllInputs(); renderHistory();
+                    });
+                } else {
+                    transactions = []; calculateInventory(); updateDashboardUI(); renderHistory();
+                }
+            });
+        }
+        initApp();
 
         window.loginWithGoogle = async function() { try { await signInWithPopup(auth, new GoogleAuthProvider()); showToast("登入成功！"); } catch (e) { showToast("登入取消", "error"); } }
         window.logout = async function() { await signOut(auth); showToast("已登出"); }
@@ -601,21 +658,19 @@
                 ud.innerHTML = `<span class="font-bold mr-2 text-white">${currentUser.displayName || '使用者'}</span><span class="text-slate-400">${currentUser.email || ''}</span>`;
                 btn.innerHTML = `<button onclick="logout()" class="text-slate-300 hover:text-white bg-slate-700/50 px-3 py-1 rounded">登出</button>`;
             } else {
-                ud.innerHTML = `<span class="text-slate-400">訪客模式 (資料僅暫存本機)</span>`;
+                ud.innerHTML = `<span class="text-slate-400">訪客模式 (資料暫存)</span>`;
                 btn.innerHTML = `<button onclick="loginWithGoogle()" class="text-white font-bold bg-primary-600 hover:bg-primary-500 px-3 py-1 rounded shadow-sm">Google 登入</button>`;
             }
         }
 
-        // --- Core Inventory ---
+        // --- Core Logic ---
         function calculateInventory() {
-            // 初始化
             userBuckets.forEach(b => { inventories[b.id] = {}; totals[b.id] = 0; DENOMINATIONS.forEach(d => inventories[b.id][d.id] = 0); });
             tempInventory = {}; tempTotal = 0; DENOMINATIONS.forEach(d => tempInventory[d.id] = 0);
 
             const sortedTx = [...transactions].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             sortedTx.forEach(tx => {
-                const w = tx.wallet || 'safe'; // w could be 'safe', 'temp', or 'bucket_xxx'
-                
+                const w = tx.wallet || 'safe'; 
                 DENOMINATIONS.forEach(item => {
                     const cnt = tx.counts[item.id] || 0;
                     if (cnt === 0) return;
@@ -631,7 +686,6 @@
                         if (tx.type === 'deposit') { tempInventory[item.id] += cnt; tempTotal += val; }
                         else { tempInventory[item.id] -= cnt; tempTotal -= val; }
                     } else {
-                        // bucket or safe
                         if(inventories[w]) {
                             if (tx.type === 'deposit') { inventories[w][item.id] += cnt; totals[w] += val; }
                             else { inventories[w][item.id] -= cnt; totals[w] -= val; }
@@ -639,12 +693,11 @@
                     }
                 });
             });
-            // 防呆
             Object.keys(inventories).forEach(bId => { DENOMINATIONS.forEach(d => { if(inventories[bId][d.id] < 0) inventories[bId][d.id] = 0; }); });
             DENOMINATIONS.forEach(d => { if(tempInventory[d.id] < 0) tempInventory[d.id] = 0; });
         }
 
-        // --- Theme Engine ---
+        // --- Settings & UI Logic ---
         window.selectTheme = function(t) { applyTheme(t); }
         function applyTheme(t) {
             currentTheme = t;
@@ -653,25 +706,45 @@
                 const btn = document.getElementById(`theme-btn-${c}`);
                 if(btn) btn.classList[c===t?'add':'remove']('ring-2');
             });
-            // Re-render components that use theme colors dynamically
-            renderInputGrid('safe');
-            renderInputGrid('temp');
+            renderInputGrid('safe'); renderInputGrid('temp');
         }
 
-        // --- Settings / Buckets Management ---
-        window.openSettingsModal = function() { document.getElementById('settings-modal').classList.replace('modal-leave', 'modal-enter'); updateSettingsUI(); }
+        window.applyPrivacyMode = function(isEnabled) {
+            appSettings.privacyMode = isEnabled;
+            if (isEnabled) {
+                document.body.classList.add('privacy-on');
+            } else {
+                document.body.classList.remove('privacy-on');
+            }
+        }
+
+        window.toggleVoice = function(isEnabled) {
+            appSettings.voiceEnabled = isEnabled;
+        }
+
+        window.openSettingsModal = function() { 
+            document.getElementById('settings-modal').classList.replace('modal-leave', 'modal-enter'); 
+            updateSettingsUI(); 
+        }
         window.closeSettingsModal = function() { document.getElementById('settings-modal').classList.replace('modal-enter', 'modal-leave'); }
         
         function updateSettingsUI() {
+            // Update Toggles
+            document.getElementById('setting-voice').checked = appSettings.voiceEnabled;
+            document.getElementById('setting-privacy').checked = appSettings.privacyMode;
+
+            // Update Buckets
             const c = document.getElementById('settings-buckets-list');
+            if(!c) return;
             let html = '';
             userBuckets.forEach((b, i) => {
                 const isMain = b.id === 'safe';
+                const target = b.target || 100000;
                 html += `
                 <div class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-100">
                     <div class="flex flex-col">
                         <span class="text-sm font-bold text-slate-700">${b.name} ${isMain?'<span class="text-[10px] bg-primary-100 text-primary-700 px-1 py-0.5 rounded ml-1">預設</span>':''}</span>
-                        <span class="text-[10px] text-slate-400">目標: $${b.target.toLocaleString()}</span>
+                        <span class="text-[10px] text-slate-400">目標: $${target.toLocaleString()}</span>
                     </div>
                     ${!isMain ? `<button onclick="removeBucket(${i})" class="text-rose-400 hover:text-rose-600 font-bold text-xs p-2">刪除</button>` : ''}
                 </div>`;
@@ -686,7 +759,7 @@
             const newId = 'bucket_' + Date.now();
             userBuckets.push({id: newId, name, target});
             document.getElementById('new-bucket-name').value = ''; document.getElementById('new-bucket-target').value = '';
-            updateSettingsUI(); showToast('專項已加入清單，請記得點擊「儲存變更」');
+            updateSettingsUI(); showToast('專項已加入清單，請記得點擊「儲存所有變更」');
         }
         window.removeBucket = function(index) {
             const b = userBuckets[index];
@@ -697,37 +770,110 @@
 
         window.saveSettings = async function() {
             if (!currentUser) return showToast("請先登入", "error");
+            
+            // Get values from toggles
+            appSettings.voiceEnabled = document.getElementById('setting-voice').checked;
+            const newPrivacyMode = document.getElementById('setting-privacy').checked;
+            window.applyPrivacyMode(newPrivacyMode);
+
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'main'), { targetGoal: userBuckets[0].target, buckets: userBuckets, theme: currentTheme }, {merge: true});
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'main'), { 
+                    targetGoal: userBuckets[0].target, 
+                    buckets: userBuckets, 
+                    theme: currentTheme,
+                    voiceEnabled: appSettings.voiceEnabled,
+                    privacyMode: appSettings.privacyMode
+                }, {merge: true});
                 closeSettingsModal(); showToast("設定已儲存");
-                // Re-init variables
                 calculateInventory(); updateDashboardUI(); renderAllInputs();
             } catch(e) { showToast("儲存失敗", "error"); }
         }
 
-        // --- Dashboard Multi-Buckets Render ---
+        // --- Data Management (Export & Clear) ---
+        window.exportCSV = function() {
+            if (transactions.length === 0) return showToast("目前沒有可匯出的紀錄", "error");
+            
+            // Add BOM for Excel to display UTF-8 correctly
+            let csvContent = "\uFEFF";
+            csvContent += "日期,時間,交易類型,操作帳戶,金額(HKD)\n";
+            
+            transactions.forEach(tx => {
+                const dateObj = new Date(tx.timestamp);
+                const dateStr = dateObj.toLocaleDateString('zh-HK');
+                const timeStr = dateObj.toLocaleTimeString('zh-HK');
+                
+                let wName = tx.wallet === 'temp' ? '臨時存錢筒' : (userBuckets.find(b => b.id === tx.wallet)?.name || '主要保險箱');
+                let tName = tx.type === 'deposit' ? '存入' : (tx.type === 'withdraw' ? '提取' : (tx.type === 'audit' ? '盤點校對' : '結算轉移'));
+                
+                csvContent += `"${dateStr}","${timeStr}","${tName}","${wName}","${tx.amount}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `SafeWealth_紀錄_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("CSV 報表匯出成功！");
+        }
+
+        // 開啟自訂清除資料 Modal
+        window.clearAllData = function() {
+            if (!currentUser) return showToast("請先登入", "error");
+            document.getElementById('clear-data-modal').classList.replace('modal-leave', 'modal-enter');
+        }
+
+        window.closeClearDataModal = function() {
+            document.getElementById('clear-data-modal').classList.replace('modal-enter', 'modal-leave');
+        }
+
+        window.executeClearAllData = async function() {
+            if (!currentUser) return;
+            
+            window.closeClearDataModal();
+            showToast("正在為您刪除資料...", "success");
+            try {
+                // Delete all transaction documents concurrently
+                const deletePromises = transactions.map(tx => 
+                    deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', tx.id))
+                );
+                await Promise.all(deletePromises);
+                window.closeSettingsModal();
+                showToast("✅ 所有資料已成功清空！");
+            } catch (e) {
+                console.error("Clear data error:", e);
+                showToast("清除過程發生錯誤，請重試", "error");
+            }
+        }
+
+        // --- Dashboard & Views ---
         function updateDashboardUI() {
-            // Update Temp Safe
+            let globalTotal = tempTotal;
+            userBuckets.forEach(b => { globalTotal += (totals[b.id] || 0); });
+            animateNum('dash-global-total', globalTotal, true);
+
             animateNum('dash-temp-total', tempTotal, true);
             const trAmt = document.getElementById('temp-transfer-amount');
             if(trAmt) trAmt.innerText = '$' + tempTotal.toLocaleString(undefined, {minimumFractionDigits:1});
             
-            // Build Buckets Container
             const c = document.getElementById('dashboard-buckets-container');
-            let html = '';
+            if(!c) return; 
             
-            // Generate Selectors for views
+            let html = '';
             let selectHtml = '';
             let transferSelectHtml = '';
 
             userBuckets.forEach((b, idx) => {
                 const bTot = totals[b.id] || 0;
-                let pct = (bTot / b.target) * 100;
+                const target = b.target || 100000;
+                let pct = (bTot / target) * 100;
+                if (isNaN(pct) || pct < 0) pct = 0; 
                 let isHit = false;
                 if (pct >= 100) { pct = 100; isHit = true; }
-                const level = Math.floor(bTot / (b.target * 0.1)); // Every 10% is a level
+                const level = Math.floor(bTot / (target * 0.1)) || 0; 
 
-                // Generate Card
                 const isMain = b.id === 'safe';
                 const bgClass = isMain ? 'bg-gradient-to-br from-primary-600 to-primary-800 text-white' : 'bg-white border border-slate-100 text-slate-800';
                 const textColor = isMain ? 'text-primary-100' : 'text-slate-500';
@@ -744,13 +890,13 @@
                             <div class="${textColor} font-bold text-sm flex items-center"><span class="w-2 h-2 rounded-full ${isMain?'bg-primary-300':'bg-primary-400'} mr-2"></span>${b.name}</div>
                             <button onclick="event.stopPropagation(); openDetailsModal('${b.id}')" class="text-xs font-bold ${isMain?'bg-white/20 hover:bg-white/30 text-white':'bg-slate-50 hover:bg-slate-100 text-slate-600'} px-3 py-1 rounded-full transition-colors">明細</button>
                         </div>
-                        <div class="text-4xl font-black tracking-tight mb-6 ${numColor}">
-                            <span class="text-2xl ${numSignColor} mr-1">$</span><span id="dash-${b.id}-total" data-val="${bTot}">0</span>
+                        <div class="text-4xl font-black tracking-tight mb-6 money-blur inline-block ${numColor}">
+                            <span class="text-2xl ${numSignColor} mr-1">$</span><span id="dash-${b.id}-total" data-val="0">0</span>
                         </div>
                         <div class="${isMain?'bg-white/10 border-white/10':'bg-slate-50 border-slate-100'} backdrop-blur-sm rounded-2xl p-4 border">
                             <div class="flex justify-between items-center text-xs mb-2">
                                 <div class="font-bold flex items-center ${isHit?'text-amber-400':(isMain?'text-primary-200':'text-primary-600')}">🏆 Lv.<span class="text-sm ml-1">${level}</span></div>
-                                <div class="${isMain?'text-primary-200':'text-slate-400'}">目標: $${b.target.toLocaleString()}</div>
+                                <div class="${isMain?'text-primary-200':'text-slate-400'} money-blur inline-block">目標: $${target.toLocaleString()}</div>
                             </div>
                             <div class="w-full ${barBg} rounded-full h-2 overflow-hidden"><div class="${barFill} h-full rounded-full transition-all duration-1000" style="width: ${pct}%"></div></div>
                         </div>
@@ -762,29 +908,22 @@
             });
             c.innerHTML = html;
             
-            // Animate after render
             userBuckets.forEach(b => animateNum(`dash-${b.id}-total`, totals[b.id]||0));
 
-            // Update selectors
             const s1 = document.getElementById('active-bucket-select');
             if(s1 && s1.innerHTML !== selectHtml) { s1.innerHTML = selectHtml; s1.value = activeBucketId; }
             const s2 = document.getElementById('transfer-target-bucket');
             if(s2) s2.innerHTML = transferSelectHtml;
 
-            // Render Inventory Page Data
             renderInventoryPage();
         }
 
-        // --- Inventory Page Rendering ---
-        window.changeInventoryFilter = function() {
-            renderInventoryPage();
-        }
+        window.changeInventoryFilter = function() { renderInventoryPage(); }
 
         function renderInventoryPage() {
             const filterEl = document.getElementById('inventory-filter-select');
             const filter = filterEl?.value || 'all';
-            let inv = {};
-            let tot = 0;
+            let inv = {}; let tot = 0;
             
             DENOMINATIONS.forEach(d => inv[d.id] = 0);
 
@@ -796,28 +935,21 @@
                 DENOMINATIONS.forEach(d => inv[d.id] += tempInventory[d.id] || 0);
                 tot += tempTotal;
             } else if (filter === 'temp') {
-                DENOMINATIONS.forEach(d => inv[d.id] = tempInventory[d.id] || 0);
-                tot = tempTotal;
+                DENOMINATIONS.forEach(d => inv[d.id] = tempInventory[d.id] || 0); tot = tempTotal;
             } else {
-                DENOMINATIONS.forEach(d => inv[d.id] = (inventories[filter]||{})[d.id] || 0);
-                tot = totals[filter] || 0;
+                DENOMINATIONS.forEach(d => inv[d.id] = (inventories[filter]||{})[d.id] || 0); tot = totals[filter] || 0;
             }
 
-            // Sync Dropdown Options
             if (filterEl) {
                 let options = `<option value="all">🏦 總資產 (包含所有保險箱及存錢筒)</option>`;
                 userBuckets.forEach(b => options += `<option value="${b.id}">📦 ${b.name}</option>`);
                 options += `<option value="temp">🪙 臨時存錢筒</option>`;
-                if (filterEl.innerHTML !== options) {
-                    filterEl.innerHTML = options;
-                    filterEl.value = filter;
-                }
+                if (filterEl.innerHTML !== options) { filterEl.innerHTML = options; filterEl.value = filter; }
             }
 
             const totEl = document.getElementById('inventory-total-display');
             if(totEl) totEl.innerText = '$' + tot.toLocaleString(undefined, {minimumFractionDigits: 1});
 
-            // Render Grid
             const container = document.getElementById('inventory-list-container');
             if(!container) return;
 
@@ -827,7 +959,7 @@
                 const c = inv[item.id] || 0;
                 if (c > 0) {
                     hasNotes = true;
-                    htmlNotes += `<div class="bg-white rounded-[1.5rem] p-4 sm:p-5 shadow-sm border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow"><div class="flex items-center space-x-3.5"><div class="w-[3.5rem] h-8 rounded-lg flex items-center justify-center font-black text-sm ${item.color} shadow-sm border border-white/50">${item.label}</div><div class="font-black text-slate-700 text-[15px]">${item.name}</div></div><div class="text-right"><div class="text-xs font-bold text-slate-400 mb-0.5">數量: ${c}</div><div class="font-black text-slate-800 text-lg">$${(c*item.value).toLocaleString()}</div></div></div>`;
+                    htmlNotes += `<div class="bg-white rounded-[1.5rem] p-4 sm:p-5 shadow-sm border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow"><div class="flex items-center space-x-3.5"><div class="w-[3.5rem] h-8 rounded-lg flex items-center justify-center font-black text-sm ${item.color} shadow-sm border border-white/50">${item.label}</div><div class="font-black text-slate-700 text-[15px]">${item.name}</div></div><div class="text-right"><div class="text-xs font-bold text-slate-400 mb-0.5">數量: ${c}</div><div class="font-black text-slate-800 text-lg money-blur inline-block">$${(c*item.value).toLocaleString()}</div></div></div>`;
                 }
             });
             if (!hasNotes) htmlNotes += `<div class="col-span-full text-slate-400 text-sm py-4 text-center bg-white/50 rounded-2xl border border-dashed border-slate-200">此範圍內沒有紙幣庫存</div>`;
@@ -839,7 +971,7 @@
                 const c = inv[item.id] || 0;
                 if (c > 0) {
                     hasCoins = true;
-                    htmlCoins += `<div class="bg-white rounded-[1.5rem] p-4 shadow-sm border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow"><div class="flex items-center space-x-3.5"><div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] ${item.color} shadow-sm">${item.label}</div><div class="font-black text-slate-700 text-[15px]">${item.value>=1?item.value+'元':item.label}</div></div><div class="text-right"><div class="text-xs font-bold text-slate-400 mb-0.5">數量: ${c}</div><div class="font-black text-slate-800 text-lg">$${(c*item.value).toLocaleString(undefined, {minimumFractionDigits:1})}</div></div></div>`;
+                    htmlCoins += `<div class="bg-white rounded-[1.5rem] p-4 shadow-sm border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow"><div class="flex items-center space-x-3.5"><div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-[11px] ${item.color} shadow-sm">${item.label}</div><div class="font-black text-slate-700 text-[15px]">${item.value>=1?item.value+'元':item.label}</div></div><div class="text-right"><div class="text-xs font-bold text-slate-400 mb-0.5">數量: ${c}</div><div class="font-black text-slate-800 text-lg money-blur inline-block">$${(c*item.value).toLocaleString(undefined, {minimumFractionDigits:1})}</div></div></div>`;
                 }
             });
             if (!hasCoins) htmlCoins += `<div class="col-span-full text-slate-400 text-sm py-4 text-center bg-white/50 rounded-2xl border border-dashed border-slate-200">此範圍內沒有硬幣庫存</div>`;
@@ -848,36 +980,26 @@
             container.innerHTML = htmlNotes + htmlCoins;
         }
 
-        // --- Safe Modes & Inputs ---
         window.changeActiveBucket = function() {
             activeBucketId = document.getElementById('active-bucket-select').value;
-            setTxMode('safe', modes['safe']); // refresh ui
+            setTxMode('safe', modes['safe']); 
         }
 
         window.setTxMode = function(wallet, mode) {
             modes[wallet] = mode;
-            
-            const isDep = mode === 'deposit';
-            const isWtd = mode === 'withdraw';
-            const isAud = mode === 'audit';
+            const isDep = mode === 'deposit'; const isWtd = mode === 'withdraw'; const isAud = mode === 'audit';
 
             if (wallet === 'safe') {
-                const bg = document.getElementById('safe-toggle-bg');
-                const btnDep = document.getElementById('safe-mode-dep');
-                const btnWtd = document.getElementById('safe-mode-wtd');
-                const btnAud = document.getElementById('safe-mode-aud');
-                const btnSave = document.getElementById('btn-save-safe');
-                const guide = document.getElementById('safe-audit-guide');
-
-                bg.className = `absolute w-[calc(33.333%-4px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 ${isDep ? 'toggle-pos-0' : (isWtd ? 'toggle-pos-1' : 'toggle-pos-2')}`;
+                const bg = document.getElementById('safe-toggle-bg'), btnDep = document.getElementById('safe-mode-dep'), btnWtd = document.getElementById('safe-mode-wtd'), btnAud = document.getElementById('safe-mode-aud'), btnSave = document.getElementById('btn-save-safe'), guide = document.getElementById('safe-audit-guide');
                 
-                btnDep.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isDep?'text-emerald-600':'text-slate-400'}`;
-                btnWtd.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isWtd?'text-rose-600':'text-slate-400'}`;
-                btnAud.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isAud?'text-primary-600':'text-slate-400'}`;
+                bg.className = `absolute w-[calc(33.333%-4px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-200 ${isDep ? 'toggle-pos-0' : (isWtd ? 'toggle-pos-1' : 'toggle-pos-2')}`;
+                btnDep.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors duration-150 ${isDep?'text-emerald-600':'text-slate-400'}`;
+                btnWtd.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors duration-150 ${isWtd?'text-rose-600':'text-slate-400'}`;
+                btnAud.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors duration-150 ${isAud?'text-primary-600':'text-slate-400'}`;
                 
-                if(isDep) btnSave.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
-                else if(isWtd) btnSave.className = 'bg-rose-500 hover:bg-rose-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-rose-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
-                else btnSave.className = 'bg-primary-600 hover:bg-primary-700 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-primary-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                if(isDep) btnSave.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                else if(isWtd) btnSave.className = 'bg-rose-500 hover:bg-rose-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-rose-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                else btnSave.className = 'bg-primary-600 hover:bg-primary-700 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-primary-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
 
                 if(isAud) {
                     guide.classList.remove('hidden'); document.getElementById('safe-tx-label').innerText = '盤點後總庫存';
@@ -889,11 +1011,13 @@
                 }
             } else {
                 const bg = document.getElementById('temp-toggle-bg'), btnDep = document.getElementById('temp-mode-dep'), btnWtd = document.getElementById('temp-mode-wtd'), btnSave = document.getElementById('btn-save-temp');
-                bg.className = `absolute w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-300 ${isDep ? 'toggle-pos-0' : 'toggle-pos-1'}`;
-                btnDep.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isDep?'text-emerald-600':'text-slate-400'}`;
-                btnWtd.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors ${isWtd?'text-rose-600':'text-slate-400'}`;
-                if(isDep) btnSave.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
-                else btnSave.className = 'bg-rose-500 hover:bg-rose-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all shadow-lg shadow-rose-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                
+                bg.className = `absolute w-[calc(50%-6px)] h-[calc(100%-12px)] bg-white rounded-xl shadow-sm transition-transform duration-200 ${isDep ? 'toggle-pos-0' : 'toggle-pos-1'}`;
+                btnDep.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors duration-150 ${isDep?'text-emerald-600':'text-slate-400'}`;
+                btnWtd.className = `relative z-10 flex-1 py-2.5 text-sm font-bold transition-colors duration-150 ${isWtd?'text-rose-600':'text-slate-400'}`;
+                
+                if(isDep) btnSave.className = 'bg-emerald-500 hover:bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-emerald-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
+                else btnSave.className = 'bg-rose-500 hover:bg-rose-600 text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-[1.25rem] font-bold transition-all duration-200 shadow-lg shadow-rose-500/30 active:scale-95 shrink-0 flex items-center space-x-2';
                 resetInputs('temp');
             }
             updateFormTotal(wallet); renderInputGrid(wallet);
@@ -909,10 +1033,10 @@
                     if (modes[wallet] === 'audit') {
                         const diff = count - ((inventories[activeBucketId]||{})[item.id]||0);
                         if(diff === 0) subEl.innerHTML = `<span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">無誤差</span>`;
-                        else if(diff > 0) subEl.innerHTML = `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">多 ${diff}</span>`;
-                        else subEl.innerHTML = `<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md">少 ${Math.abs(diff)}</span>`;
+                        else if(diff > 0) subEl.innerHTML = `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md money-blur inline-block">多 ${diff}</span>`;
+                        else subEl.innerHTML = `<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md money-blur inline-block">少 ${Math.abs(diff)}</span>`;
                     } else {
-                        if (count > 0) subEl.innerHTML = `<span class="text-sm font-black ${modes[wallet]==='deposit'?'text-emerald-500':'text-rose-500'}">$${(count * item.value).toLocaleString()}</span>`;
+                        if (count > 0) subEl.innerHTML = `<span class="text-sm font-black ${modes[wallet]==='deposit'?'text-emerald-500':'text-rose-500'} money-blur inline-block">$${(count * item.value).toLocaleString()}</span>`;
                         else subEl.innerHTML = '';
                     }
                 }
@@ -920,17 +1044,38 @@
 
             const totalEl = document.getElementById(`${wallet}-tx-total`);
             if (modes[wallet] === 'audit') {
-                totalEl.innerText = '$' + total.toLocaleString(); totalEl.className = 'text-2xl sm:text-3xl font-black text-primary-600 leading-none';
+                totalEl.innerText = '$' + total.toLocaleString(); totalEl.className = 'text-2xl sm:text-3xl font-black text-primary-600 leading-none money-blur inline-block';
                 const diffEl = document.getElementById('safe-audit-diff');
                 if (diffEl) {
                     const diffTotal = total - (totals[activeBucketId]||0);
                     if(diffTotal === 0) { diffEl.innerText = '(無誤差)'; diffEl.className = 'text-xs font-bold ml-2 text-slate-400'; }
-                    else if(diffTotal > 0) { diffEl.innerText = `(+ $${diffTotal.toLocaleString()})`; diffEl.className = 'text-xs font-bold ml-2 text-emerald-500'; }
-                    else { diffEl.innerText = `(- $${Math.abs(diffTotal).toLocaleString()})`; diffEl.className = 'text-xs font-bold ml-2 text-rose-500'; }
+                    else if(diffTotal > 0) { diffEl.innerText = `(+ $${diffTotal.toLocaleString()})`; diffEl.className = 'text-xs font-bold ml-2 text-emerald-500 money-blur inline-block'; }
+                    else { diffEl.innerText = `(- $${Math.abs(diffTotal).toLocaleString()})`; diffEl.className = 'text-xs font-bold ml-2 text-rose-500 money-blur inline-block'; }
                 }
             } else {
                 totalEl.innerText = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 1});
-                totalEl.className = `text-2xl sm:text-3xl font-black ${modes[wallet]==='deposit'?'text-emerald-500':'text-rose-500'} leading-none`;
+                totalEl.className = `text-2xl sm:text-3xl font-black ${modes[wallet]==='deposit'?'text-emerald-500':'text-rose-500'} leading-none money-blur inline-block`;
+            }
+        }
+
+        function updateSpecificButton(wallet, id) {
+            const btn = document.getElementById(`${wallet}-btn-plus-${id}`);
+            if (!btn) return;
+            
+            const currentMode = modes[wallet];
+            let modeThemeColor = currentMode === 'deposit' ? 'bg-emerald-500' : (currentMode === 'withdraw' ? 'bg-rose-500' : 'bg-primary-500');
+            const avail = (wallet === 'safe') ? ((inventories[activeBucketId]||{})[id]||0) : (tempInventory[id]||0);
+            const isLimit = currentMode === 'withdraw' && (inputs[wallet][id]||0) >= avail;
+            
+            const isNote = id.startsWith('n');
+            const baseClasses = isNote ? "w-10 h-10 rounded-xl flex items-center justify-center transition-all " : "w-8 h-8 rounded-[10px] flex items-center justify-center transition-all ";
+            
+            if (isLimit) {
+                btn.disabled = true;
+                btn.className = baseClasses + "bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed";
+            } else {
+                btn.disabled = false;
+                btn.className = baseClasses + modeThemeColor + " text-white shadow-md active:scale-95 hover:opacity-90";
             }
         }
 
@@ -941,15 +1086,16 @@
                 if (val > (max||0)) { showToast(`庫存僅剩 ${max||0}`, "error"); val = max || 0; }
             }
             inputs[wallet][id] = val; document.getElementById(`${wallet}-inp-${id}`).value = val;
-            updateFormTotal(wallet); renderInputGrid(wallet); 
+            updateFormTotal(wallet); updateSpecificButton(wallet, id); 
         }
+
         window.handleInput = function(wallet, id, e) {
             let val = parseInt(e.target.value, 10); val = isNaN(val) ? 0 : Math.max(0, val);
             if (modes[wallet] === 'withdraw') {
                 const max = (wallet === 'safe') ? (inventories[activeBucketId]||{})[id] : tempInventory[id];
                 if (val > (max||0)) { val = max || 0; e.target.value = val; showToast("超過庫存", "error"); }
             }
-            inputs[wallet][id] = val; updateFormTotal(wallet); renderInputGrid(wallet);
+            inputs[wallet][id] = val; updateFormTotal(wallet); updateSpecificButton(wallet, id);
         }
 
         function renderInputGrid(wallet) {
@@ -973,7 +1119,7 @@
                     <div class="flex items-center justify-between bg-slate-50/80 border border-slate-100 p-1.5 rounded-2xl group-hover:bg-slate-50 transition-colors">
                         <button onclick="changeCount('${wallet}','${item.id}',-1)" class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 shadow-sm hover:bg-slate-100 hover:text-slate-700 flex items-center justify-center active:scale-95"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
                         <input type="number" id="${wallet}-inp-${item.id}" value="${inputs[wallet][item.id]||0}" oninput="handleInput('${wallet}','${item.id}', event)" class="w-16 text-center font-black text-xl text-slate-800 bg-transparent focus:outline-none p-0">
-                        <button onclick="changeCount('${wallet}','${item.id}',1)" class="w-10 h-10 rounded-xl ${isLimit?'bg-slate-200 text-slate-400 cursor-not-allowed':(modeThemeColor + ' text-white shadow-md active:scale-95 hover:opacity-90')} flex items-center justify-center" ${isLimit?'disabled':''}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+                        <button id="${wallet}-btn-plus-${item.id}" onclick="changeCount('${wallet}','${item.id}',1)" class="w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isLimit?'bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed':(modeThemeColor + ' text-white shadow-md active:scale-95 hover:opacity-90')}" ${isLimit?'disabled':''}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
                     </div>
                 </div>`;
             });
@@ -991,7 +1137,7 @@
                     <div class="flex items-center justify-between bg-slate-50/80 border border-slate-100 p-1.5 rounded-2xl mt-auto pt-1.5 group-hover:bg-slate-50" style="margin-top: 1rem;">
                         <button onclick="changeCount('${wallet}','${item.id}',-1)" class="w-8 h-8 rounded-[10px] bg-white border border-slate-200 text-slate-500 shadow-sm hover:bg-slate-100 flex items-center justify-center active:scale-95"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
                         <input type="number" id="${wallet}-inp-${item.id}" value="${inputs[wallet][item.id]||0}" oninput="handleInput('${wallet}','${item.id}', event)" class="w-12 text-center font-black text-lg text-slate-800 bg-transparent focus:outline-none p-0">
-                        <button onclick="changeCount('${wallet}','${item.id}',1)" class="w-8 h-8 rounded-[10px] ${isLimit?'bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed':(modeThemeColor + ' text-white shadow-md active:scale-95 hover:opacity-90')} flex items-center justify-center" ${isLimit?'disabled':''}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
+                        <button id="${wallet}-btn-plus-${item.id}" onclick="changeCount('${wallet}','${item.id}',1)" class="w-8 h-8 rounded-[10px] flex items-center justify-center transition-all ${isLimit?'bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed':(modeThemeColor + ' text-white shadow-md active:scale-95 hover:opacity-90')}" ${isLimit?'disabled':''}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg></button>
                     </div>
                 </div>`;
             });
@@ -1021,7 +1167,7 @@
             try {
                 const dateStr = new Date().toISOString().split('T')[0];
                 const txId = Date.now().toString();
-                // Check if target goal hit
+                
                 const bucketObj = userBuckets.find(b=>b.id === targetWallet);
                 let hitGoal = false;
                 if(bucketObj && mode==='deposit') {
@@ -1036,14 +1182,9 @@
                 
                 showToast(`✅ 已完成記錄`);
                 
-                // 觸發語音播報
-                if (mode === 'deposit') {
-                    playVoice(`勁喎！成功存入 ${totalDeltaAmount} 蚊！`);
-                } else if (mode === 'withdraw') {
-                    playVoice(`提取咗 ${totalDeltaAmount} 蚊，慳啲使啦！`);
-                } else if (mode === 'audit') {
-                    playVoice(`盤點完成，庫存已更新！`);
-                }
+                if (mode === 'deposit') playVoice(`勁喎！成功存入 ${totalDeltaAmount} 蚊！`);
+                else if (mode === 'withdraw') playVoice(`提取咗 ${totalDeltaAmount} 蚊，慳啲使啦！`);
+                else if (mode === 'audit') playVoice(`盤點完成，庫存已更新！`);
 
                 if(hitGoal) { triggerConfetti(); showToast(`🎉 恭喜！${bucketObj.name} 達成目標！`); }
                 if(mode === 'audit') setTxMode('safe', 'deposit'); else { resetInputs(wallet); renderInputGrid(wallet); }
@@ -1051,7 +1192,6 @@
             } catch (e) { showToast("儲存失敗", "error"); }
         }
 
-        // --- Transfer & Modals ---
         window.openTransferModal = function() {
             if (tempTotal <= 0) return showToast("臨時存錢筒沒有餘額", "error");
             document.getElementById('transfer-modal-amount').innerText = '$' + tempTotal.toLocaleString(undefined, {minimumFractionDigits:1});
@@ -1074,12 +1214,10 @@
                     counts: { ...tempInventory }, amount: tempTotal, timestamp: new Date().toISOString()
                 });
                 
-                const settledAmount = tempTotal; // 保存播報用金額
-                
+                const settledAmount = tempTotal;
                 closeTransferModal(); 
-                triggerConfetti(); // 撒花特效！
-                playVoice(`太正啦！成功將 ${settledAmount} 蚊結算至保險箱！`); // 結算語音
-                
+                triggerConfetti(); 
+                playVoice(`太正啦！成功將 ${settledAmount} 蚊結算至保險箱！`); 
                 showToast(`✅ 已成功轉移至 ${bName}`); switchTab('home');
             } catch(e) { showToast("結算失敗", "error"); }
         }
@@ -1095,10 +1233,10 @@
             DENOMINATIONS.forEach(item => {
                 const cnt = inv[item.id] || 0;
                 if (cnt > 0) {
-                    html += `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><div class="flex items-center space-x-3"><div class="w-10 h-6 rounded flex justify-center items-center text-[10px] font-bold ${item.color.split(' ')[1]} ${item.color.split(' ')[0]}">${item.label}</div><div class="text-sm font-bold text-slate-700">${item.name} <span class="text-slate-400 ml-1">x ${cnt}</span></div></div><div class="font-black text-slate-800">$${(cnt*item.value).toLocaleString(undefined, {minimumFractionDigits: item.type==='coin'?1:0})}</div></div>`;
+                    html += `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><div class="flex items-center space-x-3"><div class="w-10 h-6 rounded flex justify-center items-center text-[10px] font-bold ${item.color.split(' ')[1]} ${item.color.split(' ')[0]}">${item.label}</div><div class="text-sm font-bold text-slate-700">${item.name} <span class="text-slate-400 ml-1">x ${cnt}</span></div></div><div class="font-black text-slate-800 money-blur inline-block">$${(cnt*item.value).toLocaleString(undefined, {minimumFractionDigits: item.type==='coin'?1:0})}</div></div>`;
                 }
             });
-            html += `</div><div class="mt-4 pt-4 border-t border-slate-100 flex justify-between"><span class="font-bold text-slate-500">總計</span><span class="font-black text-primary-600 text-xl">$${tot.toLocaleString()}</span></div>`;
+            html += `</div><div class="mt-4 pt-4 border-t border-slate-100 flex justify-between"><span class="font-bold text-slate-500">總計</span><span class="font-black text-primary-600 text-xl money-blur inline-block">$${tot.toLocaleString()}</span></div>`;
             if(tot === 0) html = `<div class="text-center text-slate-400 py-8 text-sm">庫存為空</div>`;
             document.getElementById('details-content').innerHTML = html; document.getElementById('details-modal').classList.replace('modal-leave', 'modal-enter');
         }
@@ -1132,7 +1270,7 @@
                     amountColor = isDep ? 'text-emerald-500' : 'text-rose-500'; sign = isDep?'+':'-';
                 }
 
-                const row = `<div class="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between group"><div class="flex items-center space-x-3">${icon}<div><div class="font-bold text-sm text-slate-800">${title}</div><div class="text-[10px] text-slate-400">${new Date(tx.timestamp).toLocaleString()}</div></div></div><div class="flex items-center space-x-2"><div class="font-black ${amountColor}">${tx.type==='transfer_to_safe'?'':sign}$${amt}</div><button onclick="openDeleteModal('${tx.id}')" class="p-1.5 text-slate-300 hover:text-rose-500 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button></div></div>`;
+                const row = `<div class="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between group"><div class="flex items-center space-x-3">${icon}<div><div class="font-bold text-sm text-slate-800">${title}</div><div class="text-[10px] text-slate-400">${new Date(tx.timestamp).toLocaleString()}</div></div></div><div class="flex items-center space-x-2"><div class="font-black ${amountColor} money-blur inline-block">${tx.type==='transfer_to_safe'?'':sign}$${amt}</div><button onclick="openDeleteModal('${tx.id}')" class="p-1.5 text-slate-300 hover:text-rose-500 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button></div></div>`;
                 if(idx < 3) htmlH += row; htmlF += row;
             });
             hList.innerHTML = htmlH; fList.innerHTML = htmlF;
@@ -1151,13 +1289,11 @@
             if (modeAction && (tab === 'safe' || tab === 'temp')) setTxMode(tab, modeAction);
         }
 
-        // Init Form
+        // Init
         setTxMode('safe', 'deposit'); setTxMode('temp', 'deposit');
         
-        // PWA Service Worker 註冊 (如果您將此檔案放到伺服器上)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // 如果需要支援 Android 的安裝彈窗，您需要在同一個伺服器加上一個空的 sw.js
                 navigator.serviceWorker.register('./sw.js'); 
             });
         }
