@@ -5,12 +5,12 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#07111f" name="theme-color"/>
-<meta content="v7.1.2-full-qa" name="safewealth-version"/>
+<meta content="v7.1.4-smooth-dashboard" name="safewealth-version"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="default" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="SafeWealth" name="apple-mobile-web-app-title"/>
 <link href='data:application/manifest+json;charset=utf-8,{"name":"SafeWealth Pearl Ultimate","short_name":"SafeWealth","start_url":".","display":"standalone","background_color":"%23f7f4ef","theme_color":"%23fbfaf7"}' rel="manifest"/>
-<title>SafeWealth Pearl 7.1.2 Full QA</title>
+<title>SafeWealth Pearl 7.1.4 Smooth Dashboard</title>
 <script>try{let d=null;for(const k of ['safewealth_ultimate_v4','safewealth_atelier_v31','safewealth_v3']){const r=localStorage.getItem(k);if(r){d=JSON.parse(r);break}}const pref=d?.settings?.theme||'light';document.documentElement.dataset.theme=pref==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):pref}catch{document.documentElement.dataset.theme='light'}</script>
 <style>
 :root{
@@ -147,13 +147,192 @@ html[data-theme="dark"]{background:#07101c;color-scheme:dark}html[data-theme="da
 .sheet-option{min-height:52px!important}
 @media(max-width:699px){.top-icon,.top-avatar{min-width:44px!important;width:44px!important;height:44px!important}.history-filters{gap:6px!important}.filter-chip{flex:1 1 56px!important}}
 </style>
+
+<style id="safewealth-v714-smooth-dashboard">
+/* Route transitions: opacity only. Avoid layout transforms, smooth scrolling and View Transition snapshots. */
+html{scroll-behavior:auto!important}
+::view-transition-old(root),::view-transition-new(root){animation:none!important}
+.screen.active{
+  animation:swRouteFade .12s ease-out both!important;
+  transform:none!important;
+  will-change:opacity;
+}
+@keyframes swRouteFade{from{opacity:.82}to{opacity:1}}
+body.sw-route-changing .screen,
+body.sw-route-changing .main,
+body.sw-route-changing .workspace{transition:none!important}
+.bottom-nav,.nav-grid,.mobile-nav-btn{
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
+.bottom-nav{
+  contain:layout paint;
+}
+.mobile-nav-btn,.nav-btn{
+  transition:color .12s ease,background-color .12s ease!important;
+}
+.mobile-nav-btn i,.nav-btn i{
+  transition:background-color .12s ease,color .12s ease,transform .12s ease!important;
+}
+.mobile-nav-btn:active i,.nav-btn:active i{transform:scale(.94)!important}
+.bottom-nav .ripple-dot,.sidebar .ripple-dot{display:none!important}
+
+/* Dashboard visual system */
+#screen-home .screen-heading{margin-bottom:2px!important}
+.dashboard-layout{
+  grid-template-columns:minmax(0,1.35fr) minmax(330px,.75fr)!important;
+  grid-template-areas:
+    "balance balance"
+    "vault asset"
+    "activity transfer"!important;
+  gap:15px!important;
+}
+.balance-card{
+  min-height:270px!important;
+  padding:25px 27px!important;
+  border-radius:26px!important;
+  background:
+    radial-gradient(circle at 91% 17%,rgba(92,110,255,.31),transparent 19rem),
+    radial-gradient(circle at 75% 115%,rgba(23,195,178,.20),transparent 24rem),
+    linear-gradient(135deg,#09172a 0%,#142b49 58%,#153e49 100%)!important;
+  box-shadow:0 28px 70px -43px rgba(10,31,59,.72)!important;
+}
+.balance-card::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.20;
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:28px 28px;
+  mask-image:linear-gradient(120deg,#000,transparent 72%);
+}
+.balance-top,.balance-value,.balance-meta,.balance-actions{position:relative;z-index:1}
+.balance-value{margin-top:25px!important}
+.balance-value strong{
+  font-size:clamp(48px,5.2vw,76px)!important;
+  line-height:.96!important;
+  letter-spacing:-.06em!important;
+}
+.balance-meta{
+  margin-top:15px!important;
+  padding-top:14px!important;
+  border-top:1px solid rgba(255,255,255,.10)!important;
+}
+.balance-actions{
+  width:min(650px,100%);
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+  margin-top:21px!important;
+}
+.balance-actions button{
+  min-height:64px!important;
+  padding:10px 13px!important;
+  border-radius:16px!important;
+  flex-direction:row!important;
+  justify-content:flex-start!important;
+  text-align:left!important;
+  gap:10px!important;
+}
+.balance-actions button>i{
+  width:37px!important;height:37px!important;flex:0 0 37px!important;
+  border-radius:12px!important;
+}
+.balance-actions button small{display:block!important}
+.home-panel{
+  border-radius:21px!important;
+  background:linear-gradient(145deg,#f8fafc,#edf2f7)!important;
+  box-shadow:0 17px 45px -36px rgba(17,43,75,.36)!important;
+}
+.vault-panel,.asset-breakdown,.transfer-panel,.activity-panel{padding:18px!important}
+.panel-head h3{font-size:14px!important}
+.panel-head p{font-size:8px!important}
+.vault-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.vault-card{
+  grid-template-columns:42px minmax(0,1fr) auto!important;
+  min-height:102px!important;
+  padding:13px!important;
+  border-radius:16px!important;
+}
+.vault-icon{width:42px!important;height:42px!important}
+.vault-total{font-size:16px!important}
+.asset-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.asset-col{min-height:102px!important;align-items:center!important}
+.activity-list{margin-top:9px!important}
+.activity-row{min-height:57px!important;padding:9px 2px!important}
+.transfer-panel{align-self:stretch!important}
+.transfer-route-copy{min-height:48px!important}
+.panel-cta{margin-top:11px!important}
+
+/* Tablet */
+@media (min-width:700px) and (max-width:1099px){
+  .dashboard-layout{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-template-areas:
+      "balance balance"
+      "vault asset"
+      "activity transfer"!important;
+    gap:12px!important;
+  }
+  .balance-card{min-height:255px!important}
+  .balance-value strong{font-size:clamp(47px,7vw,66px)!important}
+  .vault-grid{grid-template-columns:1fr!important}
+}
+
+/* Phone: familiar order, compact cards and no expensive movement. */
+@media (max-width:699px){
+  .screen.active{animation-duration:.09s!important}
+  .dashboard-layout{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"balance" "vault" "asset" "activity" "transfer"!important;
+    gap:10px!important;
+  }
+  #screen-home .screen-heading{padding-inline:2px!important}
+  .balance-card{
+    min-height:246px!important;
+    padding:18px!important;
+    border-radius:22px!important;
+  }
+  .balance-value{margin-top:24px!important}
+  .balance-value strong{font-size:clamp(42px,13vw,58px)!important}
+  .balance-meta{margin-top:13px!important;padding-top:12px!important}
+  .balance-actions{
+    width:100%;
+    gap:6px!important;
+    margin-top:18px!important;
+  }
+  .balance-actions button{
+    min-height:66px!important;
+    padding:8px 5px!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    text-align:center!important;
+    gap:5px!important;
+  }
+  .balance-actions button>i{width:30px!important;height:30px!important;flex-basis:30px!important}
+  .balance-actions button b{font-size:8px!important}
+  .balance-actions button small{display:none!important}
+  .vault-panel,.asset-breakdown,.transfer-panel,.activity-panel{padding:14px!important}
+  .vault-grid{grid-template-columns:1fr!important}
+  .asset-grid{grid-template-columns:1fr 1fr!important}
+  .asset-col{min-height:92px!important;padding:10px!important}
+  .home-panel{border-radius:18px!important}
+}
+@media (prefers-reduced-motion:reduce){
+  .screen.active{animation:none!important}
+}
+html[data-theme="dark"] .home-panel{
+  background:linear-gradient(145deg,#101c2d,#0d1928)!important;
+}
+</style>
 </head>
 <body class="sw-v7 auth-locked"><div aria-labelledby="swAuthTitle" aria-modal="true" class="sw-auth-gate" id="swAuthGate" role="dialog">
 <div class="auth-shell">
 <section class="auth-brand-panel">
 <div class="auth-brand"><span class="brand-mark">SW</span><div><b>SafeWealth Pearl</b><small>PRIVATE FINANCE OS</small></div></div>
 <div class="auth-message">
-<span class="auth-eyebrow"><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span> 私人財務工作空間</span>
+<span class="auth-eyebrow"><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg></span> 私人財務工作空間</span>
 <h1>管理現金資產，<br/>清楚、安全、只屬於您。</h1>
 <p>一個專為私人使用而設嘅現金庫存、保險箱、交易紀錄同財務洞察平台。</p>
 </div>
@@ -161,20 +340,20 @@ html[data-theme="dark"]{background:#07101c;color-scheme:dark}html[data-theme="da
 <div class="preview-sidebar"><i></i><i></i><i></i><i></i></div>
 <div class="preview-content"><span></span><strong></strong><div><i></i><i></i></div><svg preserveaspectratio="none" viewbox="0 0 360 100"><defs><lineargradient id="authTrend" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#36d1c4" stop-opacity=".35"></stop><stop offset="1" stop-color="#36d1c4" stop-opacity="0"></stop></lineargradient></defs><path d="M0 80 C35 74 45 85 76 62 S130 52 164 57 S210 30 248 39 S300 18 360 10 L360 100 L0 100Z" fill="url(#authTrend)"></path><path d="M0 80 C35 74 45 85 76 62 S130 52 164 57 S210 30 248 39 S300 18 360 10" fill="none" stroke="#36d1c4" stroke-width="3"></path></svg></div>
 </div>
-<div class="auth-trust"><span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span> 帳戶隔離</span><span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 18h11a4 4 0 0 0 .7-7.9A6 6 0 0 0 6.4 8.7 4.5 4.5 0 0 0 6 18Z"/><path d="m9 14 2 2 4-4"/></svg></span> 雲端同步</span><span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M10 5h4M11 18.5h2"/></svg></span> 跨裝置</span></div>
+<div class="auth-trust"><span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg></span> 帳戶隔離</span><span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 18h11a4 4 0 0 0 .7-7.9A6 6 0 0 0 6.4 8.7 4.5 4.5 0 0 0 6 18Z"></path><path d="m9 14 2 2 4-4"></path></svg></span> 雲端同步</span><span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="19" rx="2.2" width="10" x="7" y="2.5"></rect><path d="M10 5h4M11 18.5h2"></path></svg></span> 跨裝置</span></div>
 </section>
 <section class="auth-login-panel">
 <div class="auth-mobile-brand"><span class="brand-mark">SW</span><div><b>SafeWealth Pearl</b><small>PRIVATE FINANCE OS</small></div></div>
 <div class="auth-service"><i></i> 安全服務運作正常</div>
 <div class="auth-copy"><span>歡迎回來</span><h2 id="swAuthTitle">登入您的私人財務空間</h2><p>完成 Google 驗證並讀取雲端資料後，先會開啟主程式。</p></div>
 <div class="auth-features">
-<div><span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"/><path d="M12 3v18M4.5 9h15M6 15h12"/></svg></span></span><div><b>獨立資料空間</b><small>每個 Google 帳戶只讀取自己嘅資料</small></div></div>
-<div><span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 18h11a4 4 0 0 0 .7-7.9A6 6 0 0 0 6.4 8.7 4.5 4.5 0 0 0 6 18Z"/><path d="m9 14 2 2 4-4"/></svg></span></span><div><b>Firestore 同步</b><small>交易、庫存與設定自動同步</small></div></div>
-<div><span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M10 5h4M11 18.5h2"/></svg></span></span><div><b>手機、平板、電腦</b><small>同一套資料，按裝置重新排版</small></div></div>
+<div><span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"></path><path d="M12 3v18M4.5 9h15M6 15h12"></path></svg></span></span><div><b>獨立資料空間</b><small>每個 Google 帳戶只讀取自己嘅資料</small></div></div>
+<div><span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 18h11a4 4 0 0 0 .7-7.9A6 6 0 0 0 6.4 8.7 4.5 4.5 0 0 0 6 18Z"></path><path d="m9 14 2 2 4-4"></path></svg></span></span><div><b>Firestore 同步</b><small>交易、庫存與設定自動同步</small></div></div>
+<div><span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="19" rx="2.2" width="10" x="7" y="2.5"></rect><path d="M10 5h4M11 18.5h2"></path></svg></span></span><div><b>手機、平板、電腦</b><small>同一套資料，按裝置重新排版</small></div></div>
 </div>
-<button class="app-button google-login" id="swGoogleLoginButton" onclick="loginGoogle()"><span class="google-mark">G</span><span><b>使用 Google 繼續</b><small id="swAuthButtonHint">Firebase Authentication 安全登入</small></span><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14"/><path d="m14 6 6 6-6 6"/></svg></span></button>
+<button class="app-button google-login" id="swGoogleLoginButton" onclick="loginGoogle()"><span class="google-mark">G</span><span><b>使用 Google 繼續</b><small id="swAuthButtonHint">Firebase Authentication 安全登入</small></span><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14"></path><path d="m14 6 6 6-6 6"></path></svg></span></button>
 <div class="auth-status" id="swAuthStatus"><span class="auth-spinner"></span><span>正在連接 Firebase…</span></div>
-<div class="auth-privacy"><span class="ph-static" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span><p>SafeWealth 只會使用 Google 身份驗證；財務資料保存喺您嘅 Firebase 使用者空間。</p></div>
+<div class="auth-privacy"><span aria-hidden="true" class="ph-static"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3 20 6v5c0 5-3.3 8.3-8 10-4.7-1.7-8-5-8-10V6l8-3Z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg></span><p>SafeWealth 只會使用 Google 身份驗證；財務資料保存喺您嘅 Firebase 使用者空間。</p></div>
 <small class="auth-version">SafeWealth Pearl · Full QA v7.1.2</small>
 </section>
 </div>
@@ -888,6 +1067,98 @@ loadLocal();ensureSystemThemeListener();applyPreferences();seedDemo();renderAll(
       await saveSettingsCloud();renderAll();showToast('備份已還原');
     }catch(err){console.warn('Restore rejected',err);showToast('JSON 備份格式不正確','error')}finally{e.target.value=''}
   };
+})();
+</script>
+
+<script id="safewealth-v714-fast-routing">
+(()=>{
+  'use strict';
+  const PAGE_META={
+    home:['OVERVIEW','資產總覽'],
+    deposit:['CASH OPERATION','現金記錄'],
+    transfer:['VAULT TRANSFER','保險箱轉移'],
+    inventory:['INVENTORY','庫存總覽'],
+    more:['ACTIVITY & SETTINGS','記錄與設定']
+  };
+
+  function updateRouteChrome(name){
+    const meta=PAGE_META[name]||PAGE_META.home;
+    const eyebrow=document.getElementById('pageEyebrow');
+    const title=document.getElementById('appPageTitle');
+    if(eyebrow)eyebrow.textContent=meta[0];
+    if(title)title.textContent=meta[1];
+    document.querySelectorAll('[data-screen]').forEach(btn=>{
+      btn.classList.toggle('active',btn.dataset.screen===name);
+      if(btn.dataset.screen===name)btn.setAttribute('aria-current','page');
+      else btn.removeAttribute('aria-current');
+    });
+  }
+
+  function instantTop(){
+    const root=document.documentElement;
+    const previous=root.style.scrollBehavior;
+    root.style.scrollBehavior='auto';
+    window.scrollTo(0,0);
+    root.style.scrollBehavior=previous;
+  }
+
+  function activateScreen(name){
+    const next=document.getElementById(`screen-${name}`);
+    if(!next)return;
+    const current=document.querySelector('.screen.active');
+    if(current===next){
+      updateRouteChrome(name);
+      return;
+    }
+
+    document.body.classList.add('sw-route-changing');
+
+    if(name==='inventory'&&typeof renderInventory==='function')renderInventory();
+    if(name==='transfer'&&typeof renderTransfer==='function')renderTransfer();
+
+    document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));
+    next.classList.add('active');
+    updateRouteChrome(name);
+    instantTop();
+
+    requestAnimationFrame(()=>{
+      document.body.classList.remove('sw-route-changing');
+    });
+  }
+
+  function activateMoreTab(tab){
+    const mapping={history:'moreHistory',insights:'moreInsights',settings:'moreSettings'};
+    if(typeof state!=='undefined')state.moreTab=tab;
+    ['history','insights','settings'].forEach(key=>{
+      const tabButton=document.getElementById(`moreTab${key[0].toUpperCase()+key.slice(1)}`);
+      const panel=document.getElementById(mapping[key]);
+      tabButton?.classList.toggle('active',key===tab);
+      panel?.classList.toggle('hidden',key!==tab);
+    });
+    if(tab==='history'&&typeof renderHistory==='function')renderHistory();
+    else if(tab==='settings'&&typeof renderSettings==='function')renderSettings();
+    else if(tab==='insights'&&typeof renderInsights==='function')requestAnimationFrame(renderInsights);
+  }
+
+  function installFastRouting(){
+    window.switchScreen=activateScreen;
+    window.openMore=function(tab='history'){
+      activateScreen('more');
+      activateMoreTab(tab);
+    };
+    window.setMoreTab=activateMoreTab;
+
+    /* The old pointer ripple performs extra DOM writes on every navigation tap. */
+    document.addEventListener('pointerdown',event=>{
+      if(event.target.closest('.bottom-nav,.sidebar'))event.stopImmediatePropagation();
+    },true);
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(installFastRouting,0),{once:true});
+  }else{
+    setTimeout(installFastRouting,0);
+  }
 })();
 </script>
 </body></html>
