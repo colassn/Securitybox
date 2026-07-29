@@ -326,6 +326,72 @@ html[data-theme="dark"] .home-panel{
   background:linear-gradient(145deg,#101c2d,#0d1928)!important;
 }
 </style>
+
+<style id="safewealth-v715-ergonomic-fix">
+/* Stop tap-triggered layout jitter */
+.app-button:active,.app-button:focus,.app-button:focus-visible{transform:none!important;outline:none!important}
+.step-btn,.step-value,.route-vault,.more-tab,.setting-row,.theme-choice,.density-choice,.sheet-option{transform:none!important}
+
+/* Better click targets for denomination steppers */
+.custom-stepper{grid-template-columns:36px minmax(0,1fr) 36px!important;gap:4px!important;padding:4px!important}
+.step-btn{width:36px!important;min-width:36px!important;height:32px!important;line-height:1!important;padding:0!important;font-size:18px!important;font-weight:900!important}
+.step-value{min-width:0!important;height:32px!important;padding:0 6px!important;font-size:16px!important;font-weight:900!important;font-variant-numeric:tabular-nums!important}
+.denom-card{display:grid!important;align-content:start!important}
+.denom-title{line-height:1.2!important}
+
+/* Records / insights / settings should use a top tab bar, not a cramped left rail */
+.more-layout{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+.more-tabs{position:static!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;padding:7px!important;border-radius:20px!important;background:#e7edf5!important;margin-bottom:2px!important}
+.more-tab{min-height:72px!important;display:grid!important;grid-template-columns:40px minmax(0,1fr)!important;align-items:center!important;gap:10px!important;padding:10px 12px!important;text-align:left!important}
+.more-tab>i{width:40px!important;height:40px!important;border-radius:14px!important}
+.more-tab b{font-size:11px!important;line-height:1.2!important}.more-tab small{display:block!important;font-size:8px!important;line-height:1.35!important}
+.more-content,.more-panel{min-width:0!important}
+
+/* Suggestions card layout */
+.suggestion-list{display:grid!important;gap:10px!important}
+.suggestion-row{display:grid!important;grid-template-columns:40px minmax(0,1fr) 16px!important;gap:10px!important;align-items:start!important;padding:14px!important;border-radius:16px!important;background:#f4f7fb!important;border:1px solid var(--line)!important}
+.suggestion-icon{width:40px!important;height:40px!important;border-radius:14px!important;display:grid!important;place-items:center!important;background:#dce7ff!important;color:#315fc9!important;font-size:18px!important}
+.suggestion-copy{min-width:0!important}.suggestion-copy b{display:block!important;font-size:12px!important;line-height:1.3!important}.suggestion-copy p{margin:4px 0 0!important;color:var(--muted)!important;font-size:10px!important;line-height:1.55!important}
+
+/* Transfer route cards */
+.transfer-route{grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr)!important;gap:12px!important;align-items:stretch!important}
+.route-vault{display:grid!important;grid-template-columns:42px minmax(0,1fr)!important;grid-template-areas:'icon role' 'icon name' 'icon amount' 'meta meta'!important;gap:3px 12px!important;align-content:start!important;padding:16px!important}
+.route-vault .route-icon{grid-area:icon!important;width:42px!important;height:42px!important;border-radius:14px!important;display:grid!important;place-items:center!important;background:#dce7ff!important;color:#315fc9!important;font-size:19px!important}
+.route-vault small{grid-area:role!important;margin:0!important;display:block!important;color:var(--muted)!important;font-size:8px!important;letter-spacing:.04em!important;text-transform:uppercase!important}
+.route-vault b{grid-area:name!important;margin:0!important;display:block!important;font-size:13px!important;line-height:1.3!important}
+.route-vault strong{grid-area:amount!important;margin:1px 0 0!important;display:block!important;font-size:24px!important;line-height:1.05!important;color:#17304f!important;font-variant-numeric:tabular-nums!important}
+.route-vault .route-meta{grid-area:meta!important;margin-top:8px!important;display:block!important;color:var(--muted)!important;font-size:9px!important;line-height:1.45!important;white-space:normal!important}
+.route-arrow{width:52px!important;height:52px!important;border-radius:16px!important;font-size:19px!important;justify-self:center!important;align-self:center!important}
+
+/* Tablet/iPad keypad ergonomics */
+@media (min-width:900px){
+  .sheet-backdrop{align-items:center!important;padding:24px!important}
+  .sheet{width:min(560px,calc(100vw - 48px))!important;max-height:min(84vh,760px)!important;border-radius:30px!important;padding:10px 16px 18px!important}
+  .keypad-display{font-size:56px!important;padding:16px 10px!important}
+  .keypad{gap:10px!important}.key{height:60px!important;font-size:22px!important;border-radius:18px!important}
+}
+
+@media (max-width:1099px){
+  .more-tab{min-height:62px!important;padding:8px 10px!important}.more-tab b{font-size:10px!important}.more-tab small{display:none!important}
+}
+@media (max-width:699px){
+  .more-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:4px!important}
+  .more-tab{min-height:56px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;text-align:center!important;gap:5px!important;padding:7px 4px!important}
+  .more-tab>i{width:30px!important;height:30px!important;border-radius:10px!important}
+  .more-tab small{display:none!important}
+  .transfer-route{grid-template-columns:1fr!important;gap:10px!important}
+  .route-arrow{transform:rotate(90deg)!important}
+  .route-vault strong{font-size:22px!important}
+  .sheet-backdrop{align-items:flex-end!important;padding:0!important}
+  .sheet{width:100%!important;border-radius:28px 28px 0 0!important}
+}
+
+html[data-theme="dark"] .more-tabs{background:#101b2b!important}
+html[data-theme="dark"] .suggestion-row,html[data-theme="dark"] .route-vault{background:linear-gradient(145deg,#101c2d,#0e1928)!important;border-color:rgba(255,255,255,.075)!important}
+html[data-theme="dark"] .route-vault strong{color:#edf4fd!important}
+html[data-theme="dark"] .suggestion-icon,html[data-theme="dark"] .route-vault .route-icon{background:#183153!important;color:#8db5ff!important}
+</style>
+
 </head>
 <body class="sw-v7 auth-locked"><div aria-labelledby="swAuthTitle" aria-modal="true" class="sw-auth-gate" id="swAuthGate" role="dialog">
 <div class="auth-shell">
@@ -1161,4 +1227,35 @@ loadLocal();ensureSystemThemeListener();applyPreferences();seedDemo();renderAll(
   }
 })();
 </script>
+
+<script id="safewealth-v715-runtime">
+(()=>{
+  const routeIcon=(a)=>a.role==='main'?'ph-shield-checkered':a.role==='holding'?'ph-briefcase-metal':'ph-safe';
+  window.routeCard=function(a,role){
+    const st=accountStats(a);
+    return `<span class="route-icon"><i class="ph ${routeIcon(a)}"></i></span><small>${role}</small><b>${esc(a.name)}</b><strong>HK$ ${money(state.totals[a.id]||0)}</strong><span class="route-meta">紙幣 ${st.notes} 張 · 硬幣 ${st.coins} 枚</span>`;
+  };
+
+  window.renderTransfer=function(){
+    captureDenomScrolls('transfer');
+    const from=state.accounts.find(a=>a.id===state.transferFrom)||state.accounts[0];
+    const to=state.accounts.find(a=>a.id===state.transferTo)||state.accounts.find(a=>a.id!==from.id)||state.accounts[0];
+    $('transferFromCard').innerHTML=window.routeCard(from,'來源保險箱');
+    $('transferToCard').innerHTML=window.routeCard(to,'目的地保險箱');
+    $('transferCoinsSection').innerHTML=sectionHTML('coin','transfer');
+    $('transferNotesSection').innerHTML=sectionHTML('note','transfer');
+    $('transferTotalPieces').textContent=countPieces(state.transferCounts);
+    $('transferTotalAmount').textContent=`HK$ ${money(amountFromCounts(state.transferCounts))}`;
+    restoreDenomScrolls('transfer');
+  };
+
+  const rerender=()=>{
+    if(document.getElementById('transferFromCard')) window.renderTransfer();
+    if(typeof renderInsights==='function' && document.getElementById('smartSuggestions') && state?.moreTab==='insights'){ requestAnimationFrame(renderInsights); }
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',rerender,{once:true});
+  else rerender();
+})();
+</script>
+
 </body></html>
